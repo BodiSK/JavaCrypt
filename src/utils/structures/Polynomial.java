@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
-* A structure representing an element from the quotient ring Zq[X]/(X^d+1)
+* A class representing an element from the quotient ring Zq[X]/(X^d+1)
 */
 public class Polynomial {
     private BigInteger[] coefficients;
@@ -44,7 +44,6 @@ public class Polynomial {
         }
 
         BigInteger[] result = new BigInteger[this.polynomialDegree.intValue()];
-        Arrays.fill(result, BigInteger.ZERO);
 
         for (int i = 0; i < this.coefficients.length; i++) {
             result[i] = this.coefficients[i].add(polynomial.getCoefficients()[i]).mod(modulus);
@@ -68,6 +67,7 @@ public class Polynomial {
      * @return  polynomial with negative coefficients.
      */
     public Polynomial reverseSign() {
+        //TODO - could be rewritten using negate
         BigInteger[] result = new BigInteger[this.polynomialDegree.intValue()];
         Arrays.fill(result, new BigInteger("-1"));
         for (int i = 0; i < this.coefficients.length; i++) {
@@ -90,6 +90,7 @@ public class Polynomial {
             throw new UnsupportedOperationException("Degree of polynomials must be the same to perform multiplication");
         }
 
+        //TODO - refactor code and check with a more comprehensive example
         int degree = this.polynomialDegree.intValue();
         BigInteger[] result = new BigInteger[degree];
         Arrays.fill(result, BigInteger.ZERO);
@@ -100,23 +101,23 @@ public class Polynomial {
         }
 
         int index;
-        boolean isPos;
+        boolean positive;
         BigInteger coefficient;
 
         /*standard polynomial multiplication performed as a convolution*/
         for (int i = 0; i < 2 * degree - 1; i++) {
             index = i % degree;
-            isPos = i < degree;
+            positive = i < degree;
             coefficient = BigInteger.ZERO;
             for (int j = 0; j < degree; j++) {
                 if (0 <= i - j && i-j < degree) {
                     coefficient = coefficient.add(coefficients[j].multiply(polyCoefficients[i - j]));
                 }
             }
-            /*respect to the relation of congruence in the quotient ring meaning that we apply the following rule
+            /* respect to the relation of congruence in the quotient ring meaning that we apply the following rule
             * x^(d+1) = -x
-            * x^(d+2) = -x^2 and so on*/
-            if (isPos)
+            * x^(d+2) = -x^2 and so on */
+            if (positive)
                 result[index] = result[index].add(coefficient);
             else
                 result[index] = result[index].subtract(coefficient);
