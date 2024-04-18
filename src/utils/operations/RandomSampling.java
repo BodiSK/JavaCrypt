@@ -12,9 +12,9 @@ public class RandomSampling {
 
 
     /**
-     * Pick a given number of values from a normal distribution in given bound
+     * Picks a given number of values from a normal distribution in given bound.
      *
-     * A more complex logic applied to ensure that the distribution of generated values is uniform
+     * A more complex logic is applied to ensure that the distribution of generated values is uniform
      * across the entire range even for wider range
      * by first generating a random value with bit length of the range
      * then adjusting these values to fall within the desired range
@@ -110,3 +110,6 @@ public class RandomSampling {
         return result;
     }
 }
+
+
+//TODO: check what advantages come if we use only Apache commons math https://commons.apache.org/proper/commons-math/userguide/random.html

@@ -28,7 +28,7 @@ public class Polynomial {
     }
 
     /**
-     * Addition of two Polynomials in the ring Zq[X]/(X^d+1).
+     * Performs addition of two Polynomials in the ring Zq[X]/(X^d+1).
      *
      * @param polynomial to serve as the second addend.
      * @param modulus the modulus q.
@@ -78,7 +78,7 @@ public class Polynomial {
     }
 
     /**
-     * Standard Multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N^2).
+     * Performs standard Multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N^2).
      *
      * @param polynomial to serve as the second multiplicand.
      * @param modulus the modulus q.
