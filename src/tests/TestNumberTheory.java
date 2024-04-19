@@ -30,7 +30,8 @@ public class TestNumberTheory {
 //        System.out.println(result);
 
 
-        System.out.println(NumberTheory.findRootOfUnity(new BigInteger("3"), new BigInteger("7")));
+        System.out.println(NumberTheory.findRootOfUnity(new BigInteger("3"), new BigInteger("13")));
+
     }
 
 

@@ -1,6 +1,9 @@
 package utils.operations;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -13,6 +16,8 @@ public class NumberTheory {
     // Certainty value to check if a number is prime
     // build in function computes with probability 1 -1/2^CERTAINTY thus providing high accuracy of the result
     private static final int CERTAINTY = 200;
+    private static final MathContext CALCULATIONS_ACCURACY = new MathContext(100);
+    private static final RoundingMode ROUNDING_MODE = RoundingMode.FLOOR;
 
     /**
      * Performs calculations of value^power mod modulus without risking overflow
@@ -140,7 +145,7 @@ public class NumberTheory {
                     " Modulus should be prime number", modulus.intValue()));
         }
 
-        if(modulus.subtract(BigInteger.ONE).mod(order).compareTo(BigInteger.ZERO) != 0) {
+        if(!modulus.subtract(BigInteger.ONE).mod(order).equals(BigInteger.ZERO)) {
             throw new IllegalArgumentException(String.format("Incorrect value %d for order provided." +
                     " Order should divide modulus - 1  = %d", order.intValue(), modulus.subtract(BigInteger.ONE).intValue()));
         }
@@ -152,16 +157,38 @@ public class NumberTheory {
         }
 
         //TODO division must be done rounding down to the floor - how do I fix that?
-        BigInteger power = (modulus.subtract(BigInteger.ONE)).divide(modulus);
+
+        BigInteger modulusMinusOne = modulus.subtract(BigInteger.ONE);
+        BigInteger power = performBigIntegerDivisionHalfDown(modulusMinusOne, order);
 
         BigInteger result = raiseExponentInModulus(generator.get(),power, modulus);
 
-        if (result.compareTo(BigInteger.ONE) == 0) {
+        if (result.equals(BigInteger.ONE)) {
             return findRootOfUnity(order, modulus);
         }
 
         return result;
     }
+
+    public static BigInteger performBigIntegerDivisionHalfDown(BigInteger dividend, BigInteger divisor) {
+        BigDecimal dividendToDecimal = new BigDecimal(dividend);
+        BigDecimal divisorToDecimal = new BigDecimal(divisor);
+        BigDecimal result = dividendToDecimal.divide(divisorToDecimal, ROUNDING_MODE);
+        return new BigInteger(String.valueOf(result.intValue()));
+    }
+
+    //TODO find a more optimal way of halving down the division of two BigIntegers
+//    public static BigInteger performBigIntegerDivisionHalfDownWithoutPrecisionLoss(BigInteger dividend, BigInteger divisor) {
+//        BigInteger[] result = dividend.divideAndRemainder(divisor);
+//        BigInteger quotient = result[0];
+//
+//        // Check if the remainder requires rounding
+////        if (result[1].multiply(BigInteger.valueOf(2)).compareTo(divisor) >= 0) {
+////            quotient = quotient.subtract(BigInteger.ONE);
+////        }
+//
+//        return quotient;
+//    }
 
     //TODO go through code and ensure there is consistency in naming of variables and in comments the formulae used
     // are the same as the mathematical expressions in the theoretical part
