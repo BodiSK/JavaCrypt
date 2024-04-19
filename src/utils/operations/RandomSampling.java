@@ -21,7 +21,7 @@ public class RandomSampling {
      */
     public static BigInteger[] normalSampling(BigInteger lowerBound, BigInteger upperBound, int numberOfSamples) {
 
-        //TODO refactor and find usage of maths libraries - Apache commons/ Big Maths/ JScience
+        //TODO refactor and find usage of maths libraries - Apache commons/ Big Maths/ JScience/ matlab/scilab for Java
         if(upperBound.compareTo(lowerBound)<0) {
             throw new IllegalArgumentException("Upper bound must be greater than or equal to lower bound");
         }

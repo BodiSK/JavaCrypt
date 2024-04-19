@@ -112,7 +112,7 @@ public class NumberTheory {
         // one element (Note i = i +2)
         for (BigInteger i = new BigInteger("3"); i.compareTo(value.sqrt()) <=0; i = i.add(BigInteger.TWO)) {
             // While i divides n, print i and divide n
-            while (value.mod(i).compareTo(BigInteger.ZERO) == 0) {
+            while (value.mod(i).equals(BigInteger.ZERO)) {
                 factors.add(i);
                 value = value.divide(i);
             }

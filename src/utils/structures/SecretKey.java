@@ -2,7 +2,7 @@ package utils.structures;
 
 
 /**
- * A wrapper class for a Public Key instance
+ * A wrapper class for a Secret Key instance
  *
  */
 public class SecretKey {
