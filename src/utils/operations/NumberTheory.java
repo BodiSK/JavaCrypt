@@ -38,7 +38,8 @@ public class NumberTheory {
     public static BigInteger modInverseWithPrimeModulus(BigInteger value, BigInteger modulus) {
 
         if (!testPrime(modulus)) {
-            throw new IllegalArgumentException(String.format("Incorrect value %d for modulus provided. Modulus should be prime number", modulus.intValue()));
+            throw new IllegalArgumentException(String.format("Incorrect value %d for modulus provided. Modulus should be prime number",
+                    modulus.intValue()));
         }
         return value.modInverse(modulus);
     }
@@ -52,7 +53,8 @@ public class NumberTheory {
 
     /**
      * Finds a generator or a primitive root of q with respect to q where q is a prime modulus
-     * a generator is a number g in the range [1, q-1] that raised to the powers in range [1, q-1] gives distinct numbers with respect to modulus q
+     * a generator is a number g in the range [1, q-1]
+     * that raised to the powers in range [1, q-1] gives distinct numbers with respect to modulus q
      * the multiplicative order of a generator (the smallest positive exponent, which gives g^k = 1 mod q)
      * equals Euler's totient function, which for prime q equals q-1
      * Source: https://www.geeksforgeeks.org/primitive-root-of-a-prime-number-n-modulo-n/
@@ -156,8 +158,6 @@ public class NumberTheory {
             throw new UnsupportedOperationException(String.format("No primitive root of unity mod m = %d", modulus.intValue()));
         }
 
-        //TODO division must be done rounding down to the floor - how do I fix that?
-
         BigInteger modulusMinusOne = modulus.subtract(BigInteger.ONE);
         BigInteger power = performBigIntegerDivisionHalfDown(modulusMinusOne, order);
 
@@ -175,6 +175,10 @@ public class NumberTheory {
         BigDecimal divisorToDecimal = new BigDecimal(divisor);
         BigDecimal result = dividendToDecimal.divide(divisorToDecimal, ROUNDING_MODE);
         return new BigInteger(String.valueOf(result.intValue()));
+    }
+
+    public static BigInteger takeRemainder(BigInteger dividend, BigInteger divisor) {
+        return dividend.mod(divisor);
     }
 
     //TODO find a more optimal way of halving down the division of two BigIntegers
