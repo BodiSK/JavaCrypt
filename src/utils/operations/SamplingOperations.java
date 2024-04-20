@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * A class encapsulating functionality for random sampling from different distributions
  */
-public class RandomSampling {
+public class SamplingOperations {
     private static final Random randomGenerator = new Random();
 
 

@@ -1,11 +1,12 @@
-package utils.transformations;
+package utils.optimizations;
 
+import utils.operations.AlgebraicOperations;
 import utils.operations.BitOperations;
-import utils.operations.NumberTheory;
+
 import java.math.BigInteger;
 
 /**
- * A class encapsulating functionality for performing Number Theoretic Transformations using Fermat's theory
+ * A class encapsulating functionality for performing Number Theoretic Transformations using Fermat's theorem
  * for faster polynomial multiplications
  * By default the space computations are performed in is the quotient ring Zq[X]/(X^d+1)
  */
@@ -35,7 +36,7 @@ public class NumberTheoreticTransform {
 
         this.polynomialDegree = polynomialDegree;
         this.modulus = modulus;
-        this.rootOfUnity = NumberTheory.findRootOfUnity(BigInteger.TWO.multiply(polynomialDegree), modulus);
+        this.rootOfUnity = AlgebraicOperations.findRootOfUnity(BigInteger.TWO.multiply(polynomialDegree), modulus);
         initializeContext();
     }
 
@@ -50,13 +51,13 @@ public class NumberTheoreticTransform {
         reversedBits = new BigInteger[this.polynomialDegree.intValue()];
 
 
-        BigInteger inverseRootOfUnity = NumberTheory.modInverseWithPrimeModulus(this.rootOfUnity, this.modulus);
+        BigInteger inverseRootOfUnity = AlgebraicOperations.modInverseWithPrimeModulus(this.rootOfUnity, this.modulus);
         int width = BitOperations.logarithmBaseTwoOfBigInteger(polynomialDegree);
 
         for (int i = 0; i < polynomialDegree.intValue(); i++) {
-            powersOfRootOfUnity[i] = NumberTheory.takeRemainder(this.rootOfUnity.pow(i), this.modulus);
-            inversePowersOfRootsOfUnity[i] = NumberTheory.takeRemainder(inverseRootOfUnity.pow(i), this.modulus);
-            reversedBits[i] = NumberTheory.takeRemainder(BitOperations.bitReversal(BigInteger.valueOf(i), width), modulus);
+            powersOfRootOfUnity[i] = AlgebraicOperations.takeRemainder(this.rootOfUnity.pow(i), this.modulus);
+            inversePowersOfRootsOfUnity[i] = AlgebraicOperations.takeRemainder(inverseRootOfUnity.pow(i), this.modulus);
+            reversedBits[i] = AlgebraicOperations.takeRemainder(BitOperations.bitReversal(BigInteger.valueOf(i), width), modulus);
         }
 
     }
@@ -91,12 +92,12 @@ public class NumberTheoreticTransform {
                     int oddIdx = j + k + (1<<(i-1));
 
                     int indexOfRootOfUnity = (k << (1+logarithmBaseTwoOfDegree - i));
-                    BigInteger omegaFactor = NumberTheory.takeRemainder(
+                    BigInteger omegaFactor = AlgebraicOperations.takeRemainder(
                             roots[indexOfRootOfUnity].multiply(result[oddIdx]) ,
                             modulus);
 
-                    BigInteger butterflyPlus = NumberTheory.takeRemainder(result[evenIdx].add(omegaFactor), modulus);
-                    BigInteger butterflyMinus = NumberTheory.takeRemainder(result[evenIdx].subtract(omegaFactor), modulus);
+                    BigInteger butterflyPlus = AlgebraicOperations.takeRemainder(result[evenIdx].add(omegaFactor), modulus);
+                    BigInteger butterflyMinus = AlgebraicOperations.takeRemainder(result[evenIdx].subtract(omegaFactor), modulus);
 
                     result[evenIdx] = butterflyPlus;
                     result[oddIdx] = butterflyMinus;
@@ -116,7 +117,7 @@ public class NumberTheoreticTransform {
         BigInteger[] inputs = new BigInteger[polynomialDegree.intValue()];
 
         for (int i = 0; i < polynomialDegree.intValue(); i++) {
-            inputs[i] = NumberTheory.takeRemainder(
+            inputs[i] = AlgebraicOperations.takeRemainder(
                     toTransform[i].multiply(powersOfRootOfUnity[i]),
                     modulus);
         }
@@ -132,12 +133,12 @@ public class NumberTheoreticTransform {
         }
 
         BigInteger [] toScaleDown = runNumberTheoreticTransform(toTransform, this.inversePowersOfRootsOfUnity);
-        BigInteger inversePolynomialDegree = NumberTheory.modInverseWithPrimeModulus(this.polynomialDegree, this.modulus);
+        BigInteger inversePolynomialDegree = AlgebraicOperations.modInverseWithPrimeModulus(this.polynomialDegree, this.modulus);
 
         BigInteger[] result = new BigInteger[polynomialDegree.intValue()];
 
         for (int i = 0; i < polynomialDegree.intValue(); i++) {
-            result[i] = NumberTheory.takeRemainder(
+            result[i] = AlgebraicOperations.takeRemainder(
                     toScaleDown[i].multiply(inversePowersOfRootsOfUnity[i]).multiply(inversePolynomialDegree),
                     this.modulus);
         }

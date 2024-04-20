@@ -1,6 +1,6 @@
 package tests;
 
-import utils.operations.NumberTheory;
+import utils.operations.AlgebraicOperations;
 
 import java.math.BigInteger;
 
@@ -13,13 +13,13 @@ public class TestNumberTheory {
 //        BigInteger modulus = new BigInteger("13");
 //
 //        System.out.println(testRaiseExponentInModulus(value, power, modulus));
-//        System.out.println(NumberTheory.testPrime(new BigInteger("15485863")));
+//        System.out.println(AlgebraicOperations.testPrime(new BigInteger("15485863")));
 
-        //System.out.println(NumberTheory.findPrimitiveElementPrime(new BigInteger("7"), new BigInteger("5")));
+        //System.out.println(AlgebraicOperations.findPrimitiveElementPrime(new BigInteger("7"), new BigInteger("5")));
 
-        //System.out.println(NumberTheory.findRootOfUnity(new BigInteger("5"), new BigInteger("6")));
+        //System.out.println(AlgebraicOperations.findRootOfUnity(new BigInteger("5"), new BigInteger("6")));
 
-//        HashSet<BigInteger> factors = NumberTheory.findPrimeFactors(new BigInteger("315"));
+//        HashSet<BigInteger> factors = AlgebraicOperations.findPrimeFactors(new BigInteger("315"));
 //        StringBuilder sb = new StringBuilder();
 //
 //        for (BigInteger factor : factors) {
@@ -30,12 +30,12 @@ public class TestNumberTheory {
 //        System.out.println(result);
 
 
-        System.out.println(NumberTheory.findRootOfUnity(new BigInteger("3"), new BigInteger("13")));
+        System.out.println(AlgebraicOperations.findRootOfUnity(new BigInteger("3"), new BigInteger("13")));
 
     }
 
 
     private static BigInteger testRaiseExponentInModulus (BigInteger value, BigInteger power, BigInteger modulus){
-        return NumberTheory.raiseExponentInModulus(value, power, modulus);
+        return AlgebraicOperations.raiseExponentInModulus(value, power, modulus);
     }
 }

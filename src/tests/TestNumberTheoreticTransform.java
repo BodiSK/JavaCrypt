@@ -1,8 +1,7 @@
 package tests;
 
-import utils.operations.BitOperations;
-import utils.operations.NumberTheory;
-import utils.transformations.NumberTheoreticTransform;
+import utils.operations.AlgebraicOperations;
+import utils.optimizations.NumberTheoreticTransform;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -11,7 +10,7 @@ public class TestNumberTheoreticTransform {
     public static void main(String[] args) {
         NumberTheoreticTransform transform = new NumberTheoreticTransform(new BigInteger("4"), new BigInteger("73"));
 
-        System.out.println(NumberTheory.findRootOfUnity(new BigInteger("8"), new BigInteger("73")));
+        System.out.println(AlgebraicOperations.findRootOfUnity(new BigInteger("8"), new BigInteger("73")));
 
         BigInteger[] coefficients = new BigInteger[4];
 

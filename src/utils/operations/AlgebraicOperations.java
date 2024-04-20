@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * A class encapsulating functionality for basic number theory functions
  */
-public class NumberTheory {
+public class AlgebraicOperations {
 
     // Certainty value to check if a number is prime
     // build in function computes with probability 1 -1/2^CERTAINTY thus providing high accuracy of the result
