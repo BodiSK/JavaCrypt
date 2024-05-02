@@ -78,7 +78,7 @@ public class Polynomial {
     }
 
     /**
-     * Performs standard Multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N^2).
+     * Performs standard multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N^2).
      *
      * @param polynomial to serve as the second multiplicand.
      * @param modulus the modulus q.
@@ -126,6 +126,10 @@ public class Polynomial {
         }
 
         return new Polynomial(polynomialDegree, result);
+    }
+
+    public Polynomial multiplyNTT(Polynomial polynomial, BigInteger modulus) {
+        return null;
     }
 
     public Polynomial multiplyByScalar(BigInteger scalar, BigInteger modulus) {
