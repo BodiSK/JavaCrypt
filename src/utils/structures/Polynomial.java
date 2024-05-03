@@ -1,5 +1,8 @@
 package utils.structures;
 
+import utils.optimizations.ChineseRemainderTheorem;
+import utils.optimizations.NumberTheoreticTransform;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -128,8 +131,50 @@ public class Polynomial {
         return new Polynomial(polynomialDegree, result);
     }
 
-    public Polynomial multiplyNTT(Polynomial polynomial, BigInteger modulus) {
-        return null;
+    /**
+     * Performs standard multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
+     * using NumberTheoreticTransform optimization. First transforms both polynomial coefficients using the forward transformation
+     * then applies component wise multiplication of their coefficients and performs the inverse transformation to obtain the final result
+     *
+     * @param polynomial to serve as the second multiplicand.
+     * @param numberTheoreticTransform an instance of the number theoretic transform class to optimize the multiplication.
+     * @return  the result of multiplication of current polynomial and input polynomial with coefficients taken modulo q
+     *            and degree in range 0 to d.
+     */
+    public Polynomial multiplyNTT(Polynomial polynomial, NumberTheoreticTransform numberTheoreticTransform) {
+
+        BigInteger[] transformedFirst = numberTheoreticTransform.forwardTransform(this.coefficients);
+        BigInteger[] transformedSecond = numberTheoreticTransform.forwardTransform(polynomial.getCoefficients());
+
+        BigInteger[] transformedResultCoefficients = new BigInteger[polynomialDegree.intValue()];
+
+        for (int i = 0; i < this.polynomialDegree.intValue(); i++) {
+            transformedResultCoefficients[i] = transformedFirst[i].multiply(transformedSecond[i]);
+        }
+
+        BigInteger[] coefficients = numberTheoreticTransform.inverseTransform(transformedResultCoefficients);
+
+        Polynomial result = new Polynomial(this.polynomialDegree, coefficients);
+
+        return result;
+    }
+
+    /**
+     * Performs standard multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
+     * using ChineseRemainderTheorem optimization. First splits the big ring Zq[X]/(X^d+1) into multiple subrings so that
+     * the product of their moduli qi is equal to the modulus of the big ring q. Then using Number Theoretic Transform
+     * performs fast multiplication in the subrings and finally recombines the results using Chinese Remainder Theorem
+     *
+     * @param polynomial to serve as the second multiplicand.
+     * @param chineseRemainderTheorem an instance of the chinese remainder theorem class to optimize the operations on coefficients
+     *                                of the Java BigInteger range.
+     * @return  the result of multiplication of current polynomial and input polynomial with coefficients taken modulo q
+     *            and degree in range 0 to d.
+     */
+    public Polynomial multiplyCRT(Polynomial polynomial, ChineseRemainderTheorem chineseRemainderTheorem) {
+        int primesLength = chineseRemainderTheorem.getPrimeNumbers().length;
+
+        return  null;
     }
 
     public Polynomial multiplyByScalar(BigInteger scalar, BigInteger modulus) {

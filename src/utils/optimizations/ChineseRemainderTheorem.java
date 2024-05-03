@@ -116,4 +116,12 @@ public class ChineseRemainderTheorem {
         return reconstructedValue;
 
     }
+
+    public BigInteger[] getPrimeNumbers() {
+        return primeNumbers;
+    }
+
+    public List<NumberTheoreticTransform> getTheoreticTransformList() {
+        return theoreticTransformList;
+    }
 }

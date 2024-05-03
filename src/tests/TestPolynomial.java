@@ -1,39 +1,71 @@
 package tests;
 
+import utils.optimizations.NumberTheoreticTransform;
 import utils.structures.Polynomial;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class TestPolynomial {
     public static void main(String[] args) {
-        BigInteger degree = new BigInteger("5");
 
-        BigInteger[] polynomialACoeffs = new BigInteger[5];
-        polynomialACoeffs[0] = new BigInteger("1");
-        polynomialACoeffs[1] = new BigInteger("2");
-        polynomialACoeffs[2] = new BigInteger("3");
-        polynomialACoeffs[3] = new BigInteger("4");
-        polynomialACoeffs[4] = new BigInteger("5");
+//        //Test subtract
+//        BigInteger degree = new BigInteger("5");
+//        BigInteger modulus = new BigInteger("60");
+//
+//        BigInteger[] polynomialACoeffs = new BigInteger[5];
+//        //0, 1, 4, 5, 59
+//        polynomialACoeffs[4] = new BigInteger("0");
+//        polynomialACoeffs[3] = new BigInteger("1");
+//        polynomialACoeffs[2] = new BigInteger("4");
+//        polynomialACoeffs[1] = new BigInteger("5");
+//        polynomialACoeffs[0] = new BigInteger("59");
+//
+//        BigInteger[] polynomialBCoeffs = new BigInteger[5];
+//        //1, 2, 4, 3, 2
+//        polynomialBCoeffs[4] = new BigInteger("1");
+//        polynomialBCoeffs[3] = new BigInteger("2");
+//        polynomialBCoeffs[2] = new BigInteger("4");
+//        polynomialBCoeffs[1] = new BigInteger("3");
+//        polynomialBCoeffs[0] = new BigInteger("2");
+//
+//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
+//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
+//
+//        Polynomial subtractionResult = a.subtract(b, modulus);
+        //this works well because of the way the mod operation in BigInteger class is defined in Java
+//        System.out.println(subtractionResult.toString());
 
-        Polynomial a = new Polynomial(degree, polynomialACoeffs);
-        Polynomial b = new Polynomial(degree, polynomialACoeffs);
 
-        BigInteger modulus = new BigInteger("7");
-        Polynomial additionResult = a.add(b, modulus);
-        System.out.println(additionResult.toString());
 
-        BigInteger[] multPolynomialA = new BigInteger[3];
-        multPolynomialA[0] = new BigInteger("6");
-        multPolynomialA[1] = new BigInteger("4");
-        multPolynomialA[2] = new BigInteger("3");
+        //Test fast multiplication with number theoretic transform
+//        BigInteger degree = new BigInteger("4");
+//        BigInteger modulus = new BigInteger("73");
+//
+//        BigInteger[] polynomialACoeffs = new BigInteger[4];
+//        //0, 1, 4, 5
+//        polynomialACoeffs[0] = new BigInteger("0");
+//        polynomialACoeffs[1] = new BigInteger("1");
+//        polynomialACoeffs[2] = new BigInteger("4");
+//        polynomialACoeffs[3] = new BigInteger("5");
+//
+//        BigInteger[] polynomialBCoeffs = new BigInteger[4];
+//        //1, 2, 4, 3
+//        polynomialBCoeffs[0] = new BigInteger("1");
+//        polynomialBCoeffs[1] = new BigInteger("2");
+//        polynomialBCoeffs[2] = new BigInteger("4");
+//        polynomialBCoeffs[3] = new BigInteger("3");
+//
+//        NumberTheoreticTransform transform = new NumberTheoreticTransform(degree, modulus);
+//
+//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
+//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
+//
+//        Polynomial multiplicationResult = a.multiplyNTT(b, transform);
+//        Polynomial standardMultiplicationResult = a.multiply(b, modulus);
+//        System.out.println(multiplicationResult.toString());
+//        System.out.println(standardMultiplicationResult.toString());
 
-        BigInteger[] multPolynomialB = new BigInteger[3];
-        multPolynomialB[0] = new BigInteger("7");
-        multPolynomialB[1] = new BigInteger("2");
-        multPolynomialB[2] = new BigInteger("0");
-        Polynomial polyA = new Polynomial(new BigInteger("3"), multPolynomialA);
-        Polynomial polyB = new Polynomial(new BigInteger("3"), multPolynomialB);
 
-        System.out.println(polyA.multiply(polyB, modulus).toString());
     }
 }
