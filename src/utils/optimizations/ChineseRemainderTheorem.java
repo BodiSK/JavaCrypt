@@ -124,4 +124,8 @@ public class ChineseRemainderTheorem {
     public List<NumberTheoreticTransform> getTheoreticTransformList() {
         return theoreticTransformList;
     }
+
+    public BigInteger getPrimesProduct() {
+        return primesProduct;
+    }
 }

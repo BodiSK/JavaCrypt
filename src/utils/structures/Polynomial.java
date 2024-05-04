@@ -1,10 +1,16 @@
 package utils.structures;
 
+import utils.operations.AlgebraicOperations;
 import utils.optimizations.ChineseRemainderTheorem;
 import utils.optimizations.NumberTheoreticTransform;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
 * A class representing an element from the quotient ring Zq[X]/(X^d+1)
@@ -174,7 +180,107 @@ public class Polynomial {
     public Polynomial multiplyCRT(Polynomial polynomial, ChineseRemainderTheorem chineseRemainderTheorem) {
         int primesLength = chineseRemainderTheorem.getPrimeNumbers().length;
 
-        return  null;
+        Polynomial[] crtProducts = new Polynomial[primesLength];
+
+        for (int i = 0; i < primesLength; i++) {
+            Polynomial product = multiplyNTT(polynomial, chineseRemainderTheorem.getTheoreticTransformList().get(i));
+            crtProducts[i] = product;
+        }
+
+        int reconstructedCoefficientsLength = this.polynomialDegree.intValue();
+        BigInteger[] coefficients = new BigInteger[reconstructedCoefficientsLength];
+        BigInteger[] deconstructedValues = new BigInteger[reconstructedCoefficientsLength];
+
+        for (int i = 0; i < reconstructedCoefficientsLength; i++) {
+            for (int j = 0; j < primesLength; j++) {
+                deconstructedValues[i] = crtProducts[j].getCoefficients()[i];
+            }
+            coefficients[i] = chineseRemainderTheorem.reconstruct(deconstructedValues);
+        }
+        return  new Polynomial(this.polynomialDegree, coefficients)
+                .applySmallRoundingToCoefficients(chineseRemainderTheorem.getPrimesProduct());
+    }
+
+    //todo implement synchronization mechanisms
+//    public Polynomial multiplyCRTParallel(Polynomial polynomial, ChineseRemainderTheorem chineseRemainderTheorem) {
+//        int primesLength = chineseRemainderTheorem.getPrimeNumbers().length;
+//        Polynomial[] crtProducts = new Polynomial[primesLength];
+//
+//        // Create an ExecutorService with a fixed number of threads
+//        ExecutorService executor = Executors.newFixedThreadPool(primesLength);
+//
+//        try {
+//            // Parallelize NTT multiplication
+//            CompletableFuture<Void>[] multiplicationTasks = new CompletableFuture[primesLength];
+//            for (int i = 0; i < primesLength; i++) {
+//                final int index = i;
+//                multiplicationTasks[i] = CompletableFuture.runAsync(() -> {
+//                    crtProducts[index] = multiplyNTT(polynomial, chineseRemainderTheorem.getTheoreticTransformList().get(index));
+//                }, executor);
+//            }
+//
+//            // Wait for all NTT multiplication tasks to complete
+//            CompletableFuture<Void> allMultiplications = CompletableFuture.allOf(multiplicationTasks);
+//            allMultiplications.join();
+//
+//            // Parallelize coefficient reconstruction
+//            BigInteger[] coefficients = new BigInteger[this.polynomialDegree.intValue()];
+//            CompletableFuture<BigInteger>[] reconstructionTasks = new CompletableFuture[coefficients.length];
+//            for (int i = 0; i < coefficients.length; i++) {
+//                final int index = i;
+//                reconstructionTasks[i] = CompletableFuture.supplyAsync(() -> {
+//                    BigInteger[] deconstructedValues = new BigInteger[primesLength];
+//                    for (int j = 0; j < primesLength; j++) {
+//                        deconstructedValues[j] = crtProducts[j].getCoefficients()[index];
+//                    }
+//                    return chineseRemainderTheorem.reconstruct(deconstructedValues);
+//                }, executor);
+//            }
+//
+//            // Wait for all coefficient reconstruction tasks to complete
+//            CompletableFuture<Void> allReconstructions = CompletableFuture.allOf(reconstructionTasks);
+//            allReconstructions.join();
+//
+//            // Retrieve results from reconstruction tasks
+//            for (int i = 0; i < coefficients.length; i++) {
+//                coefficients[i] = reconstructionTasks[i].join();
+//            }
+//
+//            return new Polynomial(this.polynomialDegree, coefficients);
+//        } finally {
+//            // Shutdown the ExecutorService
+//            executor.shutdown();
+//        }
+//    }
+
+    /**
+     * Transforms each coefficient of a given polynomial in the range (-q/2, q/2] where q is  the modulus in the ring Zq[X]/(X^d+1)
+     *
+     * @param modulus the modulus with respect to which the operation is performed
+     * @throws UnsupportedOperationException if the operation fails
+     * @return  a Polynomial whose coefficients are transformed in the range (-q/2, q/2]
+     */
+    public Polynomial applySmallRoundingToCoefficients(BigInteger modulus) {
+        BigInteger[] transformedCoefficients =  new BigInteger[this.coefficients.length];
+
+        BigInteger modulusHalfDown = AlgebraicOperations.performBigIntegerDivisionHalfDown(modulus, BigInteger.TWO);
+
+        try {
+            for (int i = 0; i < coefficients.length; i++) {
+                transformedCoefficients[i] = AlgebraicOperations.takeRemainder(coefficients[i], modulus);
+
+                transformedCoefficients[i] = transformedCoefficients[i].compareTo(modulusHalfDown) > 0
+                                                ? transformedCoefficients[i].subtract(modulus)
+                                                : transformedCoefficients[i];
+
+            }
+        }
+        catch (Exception e){
+            throw new UnsupportedOperationException (String.format("Applying small rounding on polynomial coefficients with modulus %d failed",
+                    modulus.intValue()));
+        }
+
+        return new Polynomial(polynomialDegree, transformedCoefficients);
     }
 
     public Polynomial multiplyByScalar(BigInteger scalar, BigInteger modulus) {
