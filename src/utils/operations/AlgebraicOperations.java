@@ -159,7 +159,9 @@ public class AlgebraicOperations {
         }
 
         BigInteger modulusMinusOne = modulus.subtract(BigInteger.ONE);
-        BigInteger power = performBigIntegerDivisionHalfDown(modulusMinusOne, order);
+        // TODO - created problem for crtPolynomial multiplication - loss of precision - find universal solution
+        //BigInteger power = performBigIntegerDivisionHalfDown(modulusMinusOne, order);
+        BigInteger power = modulusMinusOne.divide(order);
 
         BigInteger result = raiseExponentInModulus(generator.get(),power, modulus);
 
@@ -170,6 +172,8 @@ public class AlgebraicOperations {
         return result;
     }
 
+    //todo make method more general, when working with big values the explicit turn into integer type before wrapping into BigInteger
+    // causes loss of precision, implement a general mechanism or add a condition when to use the method so the calculations would be correct
     public static BigInteger performBigIntegerDivisionHalfDown(BigInteger dividend, BigInteger divisor) {
         BigDecimal dividendToDecimal = new BigDecimal(dividend);
         BigDecimal divisorToDecimal = new BigDecimal(divisor);

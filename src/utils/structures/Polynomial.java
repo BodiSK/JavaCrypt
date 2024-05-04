@@ -189,13 +189,14 @@ public class Polynomial {
 
         int reconstructedCoefficientsLength = this.polynomialDegree.intValue();
         BigInteger[] coefficients = new BigInteger[reconstructedCoefficientsLength];
-        BigInteger[] deconstructedValues = new BigInteger[reconstructedCoefficientsLength];
+        List<BigInteger> deconstructedValues = new ArrayList<>();
 
         for (int i = 0; i < reconstructedCoefficientsLength; i++) {
+            deconstructedValues.clear();
             for (int j = 0; j < primesLength; j++) {
-                deconstructedValues[i] = crtProducts[j].getCoefficients()[i];
+                deconstructedValues.add(crtProducts[j].getCoefficients()[i]);
             }
-            coefficients[i] = chineseRemainderTheorem.reconstruct(deconstructedValues);
+            coefficients[i] = chineseRemainderTheorem.reconstruct(deconstructedValues.toArray(BigInteger[]::new));
         }
         return  new Polynomial(this.polynomialDegree, coefficients)
                 .applySmallRoundingToCoefficients(chineseRemainderTheorem.getPrimesProduct());
@@ -263,7 +264,8 @@ public class Polynomial {
     public Polynomial applySmallRoundingToCoefficients(BigInteger modulus) {
         BigInteger[] transformedCoefficients =  new BigInteger[this.coefficients.length];
 
-        BigInteger modulusHalfDown = AlgebraicOperations.performBigIntegerDivisionHalfDown(modulus, BigInteger.TWO);
+        //BigInteger modulusHalfDown = AlgebraicOperations.performBigIntegerDivisionHalfDown(modulus, BigInteger.TWO);
+        BigInteger modulusHalfDown = modulus.divide(BigInteger.TWO);
 
         try {
             for (int i = 0; i < coefficients.length; i++) {
