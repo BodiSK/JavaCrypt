@@ -1,7 +1,11 @@
 package utils.structures;
 
+import org.apache.commons.math3.complex.Complex;
+import utils.Utilities;
 import utils.operations.AlgebraicOperations;
+import utils.operations.RoundingOperations;
 import utils.optimizations.ChineseRemainderTheorem;
+import utils.optimizations.FastFourierTransform;
 import utils.optimizations.NumberTheoreticTransform;
 
 import java.math.BigInteger;
@@ -138,7 +142,7 @@ public class Polynomial {
     }
 
     /**
-     * Performs standard multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
+     * Performs faster multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
      * using NumberTheoreticTransform optimization. First transforms both polynomial coefficients using the forward transformation
      * then applies component wise multiplication of their coefficients and performs the inverse transformation to obtain the final result
      *
@@ -166,7 +170,7 @@ public class Polynomial {
     }
 
     /**
-     * Performs standard multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
+     * Performs faster multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
      * using ChineseRemainderTheorem optimization. First splits the big ring Zq[X]/(X^d+1) into multiple subrings so that
      * the product of their moduli qi is equal to the modulus of the big ring q. Then using Number Theoretic Transform
      * performs fast multiplication in the subrings and finally recombines the results using Chinese Remainder Theorem
@@ -174,8 +178,8 @@ public class Polynomial {
      * @param polynomial to serve as the second multiplicand.
      * @param chineseRemainderTheorem an instance of the chinese remainder theorem class to optimize the operations on coefficients
      *                                of the Java BigInteger range.
-     * @return  the result of multiplication of current polynomial and input polynomial with coefficients taken modulo q
-     *            and degree in range 0 to d.
+     * @return  the result of multiplication of current polynomial and input polynomial
+     *  with coefficients taken modulo q (but in the range (-q/2, q/2])  and degree in range 0 to d.
      */
     public Polynomial multiplyCRT(Polynomial polynomial, ChineseRemainderTheorem chineseRemainderTheorem) {
         int primesLength = chineseRemainderTheorem.getPrimeNumbers().length;
@@ -283,6 +287,54 @@ public class Polynomial {
         }
 
         return new Polynomial(polynomialDegree, transformedCoefficients);
+    }
+
+    /**
+     * Performs multiplication of two Polynomials in the ring Zq[X]/(X^d+1) with complexity O(N*log(N))
+     * using FastFourierTransform optimization. First transforms both polynomial coefficients using the forward transformation
+     * then applies component wise multiplication of their coefficients and performs the inverse transformation to obtain the final result
+     *
+     * @param polynomial to serve as the second multiplicand.
+     * @return  the result of multiplication of current polynomial and input polynomial with coefficients taken modulo q
+     *            and degree in range 0 to d. There might be an error due to rounding.
+     */
+    public Polynomial multiplyFFT(Polynomial polynomial) {
+        // todo explicit type casting BigInteger to Integer might cause loss of precision
+        FastFourierTransform fastFourierTransform = new FastFourierTransform(this.polynomialDegree.intValue()*8);
+
+        Complex[] toAppend = new Complex[this.polynomialDegree.intValue()];
+        Arrays.fill(toAppend, new Complex(0,0));
+
+        Complex[] firstCoefficientsExtended = Utilities.appendArrayTo(
+                RoundingOperations.transformIntegerArrayToComplexArray(this.coefficients),
+                toAppend);
+
+        Complex[] secondCoefficientsExtended = Utilities.appendArrayTo(
+                RoundingOperations.transformIntegerArrayToComplexArray(polynomial.getCoefficients()),
+                toAppend);
+
+        Complex[] transformedFirst = fastFourierTransform.forwardTransform(firstCoefficientsExtended);
+        Complex[] transformedSecond = fastFourierTransform.forwardTransform(secondCoefficientsExtended);
+
+        Complex[] transformedResultCoefficients = new Complex[polynomialDegree.intValue()*2];
+        Arrays.fill(transformedResultCoefficients, new Complex(0,0));
+
+        for (int i = 0; i <this.polynomialDegree.intValue()*2; i++) {
+            transformedResultCoefficients[i] = transformedFirst[i].multiply(transformedSecond[i]);
+        }
+
+        Complex[] inverseTransform = fastFourierTransform.inverseTransform(transformedResultCoefficients);
+        Complex[] coefficients = new Complex[this.polynomialDegree.intValue()];
+        Arrays.fill(coefficients, new Complex(0,0));
+
+        for (int i = 0; i < this.polynomialDegree.intValue()*2; i++) {
+            int index = i % polynomialDegree.intValue();
+            int sign = (i < polynomialDegree.intValue() ? 1 : -1);
+            coefficients[index] = coefficients[index].add(inverseTransform[i].multiply(sign));
+        }
+
+        BigInteger[] polynomialCoefficients = RoundingOperations.transformComplexArrayIntegerArray(coefficients);
+        return new Polynomial(polynomialDegree, polynomialCoefficients);
     }
 
     public Polynomial multiplyByScalar(BigInteger scalar, BigInteger modulus) {

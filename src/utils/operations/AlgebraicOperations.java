@@ -178,7 +178,7 @@ public class AlgebraicOperations {
         BigDecimal dividendToDecimal = new BigDecimal(dividend);
         BigDecimal divisorToDecimal = new BigDecimal(divisor);
         BigDecimal result = dividendToDecimal.divide(divisorToDecimal, ROUNDING_MODE);
-        return new BigInteger(String.valueOf(result.intValue()));
+        return result.toBigInteger();
     }
 
     public static BigInteger takeRemainder(BigInteger dividend, BigInteger divisor) {

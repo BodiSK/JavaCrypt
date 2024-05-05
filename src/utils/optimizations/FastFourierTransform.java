@@ -14,7 +14,6 @@ import java.math.BigInteger;
  */
 public class FastFourierTransform {
 
-    private BigInteger polynomialDegree;
     private int transformationLength;
     private Complex[]  powersOfRootOfUnity;
     private Complex[] inversePowersOfRootsOfUnity;
@@ -23,15 +22,9 @@ public class FastFourierTransform {
      * Initializes an instance of the class
      *
      * @param transformationLength the length of the vector to be transformed, which must be double the polynomial degree d
-     * @throws IllegalArgumentException if transformationLength is not twice the polynomialDegree
      */
-    public FastFourierTransform(int transformationLength, BigInteger polynomialDegree) {
-        if(!BigInteger.valueOf(transformationLength).equals(BigInteger.TWO.multiply(polynomialDegree))) {
-            throw  new IllegalArgumentException("Transformation length must be twice the polynomial degree!");
-        }
-
+    public FastFourierTransform(int transformationLength) {
         this.transformationLength = transformationLength;
-        this.polynomialDegree = polynomialDegree;
 
         initializeContext();
     }
