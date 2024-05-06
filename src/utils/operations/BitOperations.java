@@ -96,4 +96,30 @@ public class BitOperations {
         return result;
     }
 
+
+    public static  BigInteger[] baseDecompose(BigInteger value, int base) {
+        if (base <= 1) {
+            throw new IllegalArgumentException("Base must be greater than 1");
+        }
+
+        if (value.compareTo(BigInteger.ZERO) < 0) {
+            throw new IllegalArgumentException("Value must be non-negative");
+        }
+
+        // Calculate the number of digits required
+        int numDigits = 1 + (value.bitLength() / (int) Math.ceil(Math.log(base) / Math.log(2)));
+
+        BigInteger[] result = new BigInteger[numDigits];
+        BigInteger divisor = BigInteger.valueOf(base);
+
+        // Perform base decomposition
+        for (int i = 0; i < numDigits; i++) {
+            BigInteger[] quotientAndRemainder = value.divideAndRemainder(divisor);
+            result[i] = quotientAndRemainder[1];
+            value = quotientAndRemainder[0];
+        }
+
+        return result;
+    }
+
 }

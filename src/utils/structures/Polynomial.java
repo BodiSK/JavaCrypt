@@ -3,6 +3,7 @@ package utils.structures;
 import org.apache.commons.math3.complex.Complex;
 import utils.Utilities;
 import utils.operations.AlgebraicOperations;
+import utils.operations.BitOperations;
 import utils.operations.RoundingOperations;
 import utils.optimizations.ChineseRemainderTheorem;
 import utils.optimizations.FastFourierTransform;
@@ -296,6 +297,7 @@ public class Polynomial {
      *
      * @param polynomial to serve as the second multiplicand.
      * @return  the result of multiplication of current polynomial and input polynomial with coefficients taken modulo q
+     *            int the range (-q/2, q/2]
      *            and degree in range 0 to d. There might be an error due to rounding.
      */
     public Polynomial multiplyFFT(Polynomial polynomial) {
@@ -354,6 +356,59 @@ public class Polynomial {
         }
 
         return new Polynomial(polynomialDegree, scalarProductCoefficients);
+    }
+
+    public Polynomial divideByScalar(BigInteger scalar, BigInteger modulus) {
+        if(scalar == null) {
+            throw new IllegalArgumentException("Scalar must be a valid value!");
+        }
+
+        //todo apply fix. Mod(1) always returns zero!!!
+        if(modulus == null) {
+            modulus = scalar;
+        }
+
+        int degree = this.polynomialDegree.intValue();
+        BigInteger[] scalarDivisionCoefficients = new BigInteger[degree];
+
+        for (int i = 0; i < degree; i++) {
+            scalarDivisionCoefficients[i] = AlgebraicOperations.performBigIntegerDivisionHalfDown(
+                    coefficients[i],
+                    scalar)
+                    .mod(modulus);
+        }
+
+        return new Polynomial(polynomialDegree, scalarDivisionCoefficients);
+    }
+
+    public Polynomial getCoefficientsMod(BigInteger modulus) {
+        BigInteger[] newCoefficients = Arrays.stream(this.coefficients)
+                .map(coeff -> coeff.mod(modulus))
+                .toArray(BigInteger[]::new);
+
+        return new Polynomial(this.polynomialDegree, newCoefficients);
+    }
+
+    public Polynomial[] decomposeCoefficients(int base, int levels) {
+        Polynomial[] result = new Polynomial[levels];
+        Polynomial polynomial = new Polynomial(this.polynomialDegree, this.coefficients);
+
+        for (int i = 0; i < levels; i++) {
+            result[i] = polynomial.getCoefficientsMod(BigInteger.valueOf(base));
+            polynomial = polynomial.divideByScalar(BigInteger.valueOf(base), null);
+        }
+
+        return result;
+    }
+
+    public BigInteger evaluateOnValue(BigInteger value) {
+        BigInteger result = coefficients[coefficients.length - 1];
+
+        for (int i = coefficients.length - 2; i >= 0; i--) {
+            result = result.multiply(value).add(coefficients[i]);
+        }
+
+        return result;
     }
 
     public BigInteger[] getCoefficients() {

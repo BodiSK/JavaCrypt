@@ -21,6 +21,7 @@ public class RoundingOperations {
     public static  int performIntegerDivisionHalfDown(int dividend, int divisor) {
         BigDecimal dividendToDecimal = new BigDecimal(dividend);
         BigDecimal divisorToDecimal = new BigDecimal(divisor);
+        //possible solution of preccision loss problem - use build in methods for conversion between BigDecimal nd BigInteger
         BigDecimal result = dividendToDecimal.divide(divisorToDecimal, ROUNDING_MODE);
         return result.intValue();
     }

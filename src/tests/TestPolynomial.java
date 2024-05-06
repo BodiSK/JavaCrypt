@@ -109,31 +109,55 @@ public class TestPolynomial {
 
 
         //test polynomial multiplication with fast fourier transform
-        BigInteger degree = new BigInteger("4");
+//        BigInteger degree = new BigInteger("4");
+//        BigInteger modulus = new BigInteger("73");
+//
+//        BigInteger[] polynomialACoeffs = new BigInteger[4];
+//        //0, 1, 4, 5
+//        polynomialACoeffs[0] = new BigInteger("0");
+//        polynomialACoeffs[1] = new BigInteger("1");
+//        polynomialACoeffs[2] = new BigInteger("4");
+//        polynomialACoeffs[3] = new BigInteger("5");
+//
+//        BigInteger[] polynomialBCoeffs = new BigInteger[4];
+//        //1, 2, 4, 3
+//        polynomialBCoeffs[0] = new BigInteger("1");
+//        polynomialBCoeffs[1] = new BigInteger("2");
+//        polynomialBCoeffs[2] = new BigInteger("4");
+//        polynomialBCoeffs[3] = new BigInteger("3");
+//
+//
+//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
+//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
+//
+//        Polynomial multiplicationResult = a.multiplyFFT(b);
+//        Polynomial standardMultiplicationResult = a.multiply(b, modulus);
+//        System.out.println(multiplicationResult.toString());
+//        System.out.println(standardMultiplicationResult.toString());
+//        System.out.println(standardMultiplicationResult.divideByScalar(degree, modulus).toString());
+
+
+
+        //test base decompose method
+        BigInteger degree = new BigInteger("5");
         BigInteger modulus = new BigInteger("73");
 
-        BigInteger[] polynomialACoeffs = new BigInteger[4];
-        //0, 1, 4, 5
+        BigInteger[] polynomialACoeffs = new BigInteger[5];
+        //0, 1, 4, 5, 59
         polynomialACoeffs[0] = new BigInteger("0");
         polynomialACoeffs[1] = new BigInteger("1");
         polynomialACoeffs[2] = new BigInteger("4");
         polynomialACoeffs[3] = new BigInteger("5");
-
-        BigInteger[] polynomialBCoeffs = new BigInteger[4];
-        //1, 2, 4, 3
-        polynomialBCoeffs[0] = new BigInteger("1");
-        polynomialBCoeffs[1] = new BigInteger("2");
-        polynomialBCoeffs[2] = new BigInteger("4");
-        polynomialBCoeffs[3] = new BigInteger("3");
-
+        polynomialACoeffs[4] = new BigInteger("59");
 
         Polynomial a = new Polynomial(degree, polynomialACoeffs);
-        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
+        BigInteger evalAtFive = a.evaluateOnValue(BigInteger.valueOf(5));
+        System.out.println(evalAtFive);
 
-        Polynomial multiplicationResult = a.multiplyFFT(b);
-        Polynomial standardMultiplicationResult = a.multiply(b, modulus);
-        System.out.println(multiplicationResult.toString());
-        System.out.println(standardMultiplicationResult.toString());
+        Polynomial[] result = a.decomposeCoefficients(8, 2);
+        for (int i = 0; i < 2; i++) {
+            System.out.println(result[i].toString());
+        }
 
     }
 }
