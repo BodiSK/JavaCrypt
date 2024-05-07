@@ -2,6 +2,7 @@ package utils.structures;
 
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * A wrapper class for Plaintext from RLWE based homomorphic scheme
@@ -11,9 +12,9 @@ import java.math.BigDecimal;
 public class Plaintext {
 
     private Polynomial polynomial;
-    private BigDecimal modulus;
+    private BigInteger modulus;
 
-    public Plaintext(Polynomial polynomial, BigDecimal modulus) {
+    public Plaintext(Polynomial polynomial, BigInteger modulus) {
         this.polynomial = polynomial;
         this.modulus = modulus;
     }
@@ -22,7 +23,7 @@ public class Plaintext {
         return polynomial;
     }
 
-    public BigDecimal getModulus() {
+    public BigInteger getModulus() {
         return modulus;
     }
 

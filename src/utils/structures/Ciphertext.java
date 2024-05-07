@@ -14,10 +14,10 @@ public class Ciphertext {
 
     private Polynomial encryptionPolynomial;
     private Polynomial additionalComponent;
-    private BigDecimal scalingFactor;
+    private BigInteger scalingFactor;
     private BigInteger modulus;
 
-    public Ciphertext(Polynomial encryptionPolynomial, Polynomial additionalComponent, BigDecimal scalingFactor, BigInteger modulus) {
+    public Ciphertext(Polynomial encryptionPolynomial, Polynomial additionalComponent, BigInteger scalingFactor, BigInteger modulus) {
         this.encryptionPolynomial = encryptionPolynomial;
         this.additionalComponent = additionalComponent;
         this.scalingFactor = scalingFactor;
@@ -32,7 +32,7 @@ public class Ciphertext {
         return additionalComponent;
     }
 
-    public BigDecimal getScalingFactor() {
+    public BigInteger getScalingFactor() {
         return scalingFactor;
     }
 
