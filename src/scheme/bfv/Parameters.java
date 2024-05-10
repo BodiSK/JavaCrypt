@@ -20,7 +20,7 @@ public class Parameters {
         this.plaintextModulus = plaintextModulus;
         this.ciphertextModulus = ciphertextModulus;
 
-        this.scalingFactor = new BigDecimal(ciphertextModulus).divide(new BigDecimal(plaintextModulus));
+        this.scalingFactor = new BigDecimal(ciphertextModulus).divide(new BigDecimal(plaintextModulus), RoundingMode.HALF_EVEN);
     }
 
     public BigInteger getPolynomialDegree() {
