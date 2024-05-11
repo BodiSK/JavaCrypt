@@ -46,6 +46,7 @@ public class AlgebraicOperations {
 
 
     //TODO compare methods accuracy with miller-rabin or solovay-strassen  must have different variants for space of comparison
+    // the Apache commons has an implementation of Pollard Rho
     public static boolean testPrime(BigInteger value) {
         return value.isProbablePrime(CERTAINTY);
     }

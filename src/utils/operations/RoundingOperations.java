@@ -1,5 +1,6 @@
 package utils.operations;
 
+import com.google.common.math.BigIntegerMath;
 import org.apache.commons.math3.complex.Complex;
 
 import java.math.BigDecimal;
@@ -21,7 +22,7 @@ public class RoundingOperations {
     public static  int performIntegerDivisionHalfDown(int dividend, int divisor) {
         BigDecimal dividendToDecimal = new BigDecimal(dividend);
         BigDecimal divisorToDecimal = new BigDecimal(divisor);
-        //possible solution of preccision loss problem - use build in methods for conversion between BigDecimal nd BigInteger
+        //possible solution of preccision loss problem - use build in methods for conversion between BigDecimal and BigInteger
         BigDecimal result = dividendToDecimal.divide(divisorToDecimal, ROUNDING_MODE);
         return result.intValue();
     }
@@ -47,5 +48,25 @@ public class RoundingOperations {
         return Stream.of(values)
                 .map(RoundingOperations::transformComplexToInteger)
                 .toArray(BigInteger[]::new);
+    }
+
+    /**
+     * Performs ceil rounding (rounding up) on a BigInteger.sqrt() value.
+     * This is necessary due to the fact that the sqrt on BigInteger is rounded
+     * down
+    */
+    //todo rewrite using maths library Guava
+    public static BigInteger roundSquareRootToCeil(BigInteger value, BigInteger squared) {
+        return squared.multiply(squared).equals(value)
+                ? value
+                :value.add(BigInteger.ONE);
+    }
+
+
+    public static BigInteger getRoundedLogarithmOfArbitraryBaseToFloor(BigInteger value, BigInteger base) {
+        BigInteger logarithmValueBaseTwo = BigInteger.valueOf(BigIntegerMath.log2(value, RoundingMode.HALF_DOWN));
+        BigInteger logarithmBaseBaseTwo = BigInteger.valueOf(BigIntegerMath.log2(base, RoundingMode.HALF_DOWN));
+
+        return logarithmValueBaseTwo.divide(logarithmBaseBaseTwo);
     }
 }

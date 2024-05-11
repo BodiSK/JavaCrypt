@@ -345,7 +345,7 @@ public class Polynomial {
         }
 
         if(modulus == null) {
-            modulus = BigInteger.ONE;
+            modulus = scalar;
         }
 
         int degree = this.polynomialDegree.intValue();
