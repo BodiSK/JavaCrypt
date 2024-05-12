@@ -6,7 +6,6 @@ import utils.structures.Polynomial;
 import utils.structures.PublicKey;
 import utils.structures.SecretKey;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +23,16 @@ public class KeyGenerator {
     public KeyGenerator(Parameters parameters) {
         generateSecretKey(parameters);
         generatePublicKey(parameters);
+        generateRelinerizationKeysWithBaseDecompositionTechnique(parameters);
+    }
+
+    private BigInteger[] turnIntToBigIntTestCases(int [] array) {
+        // Convert each element to BigInteger
+        BigInteger[] bigIntegerArray = new BigInteger[array.length];
+        for (int i = 0; i < array.length; i++) {
+            bigIntegerArray[i] = BigInteger.valueOf(array[i]);
+        }
+        return bigIntegerArray;
     }
 
 
@@ -32,8 +41,10 @@ public class KeyGenerator {
      * using the triangular distribution
      */
     private void generateSecretKey(Parameters parameters) {
-        BigInteger[] randomCoefficients = SamplingOperations
-                .triangleSample(parameters.getPolynomialDegree().intValue());
+//        BigInteger[] randomCoefficients = SamplingOperations
+//                .triangleSample(parameters.getPolynomialDegree().intValue());
+
+        BigInteger[] randomCoefficients = turnIntToBigIntTestCases(new int []{0, -1, 0, 0, -1, 1, 0, 0});
 
         Polynomial secret = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
@@ -45,13 +56,18 @@ public class KeyGenerator {
      * The public key consists of a polynomial tuple, the first part is the masked secret and the second is a random polynomial.
      */
     private void generatePublicKey(Parameters parameters) {
-        BigInteger[] randomCoefficients = SamplingOperations
-                .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree().intValue());
+//        BigInteger[] randomCoefficients = SamplingOperations
+//                .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree().intValue());
+
+        BigInteger[] randomCoefficients = turnIntToBigIntTestCases(new int []
+                {459303238, 109894758, 436288360, 236934650, 385855700, 101980507, 170381229, 726689656});
 
         Polynomial randomPolynomial = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
-        BigInteger[] randomError = SamplingOperations
-                .triangleSample(parameters.getPolynomialDegree().intValue());
+//        BigInteger[] randomError = SamplingOperations
+//                .triangleSample(parameters.getPolynomialDegree().intValue());
+
+        BigInteger[] randomError = turnIntToBigIntTestCases(new int []{1, -1, 0, -1, -1, -1, 0, 0});
 
         Polynomial errorPolynomial = new Polynomial(parameters.getPolynomialDegree(), randomError);
 
@@ -64,7 +80,7 @@ public class KeyGenerator {
     }
 
     //todo - check notes row 12 downward to find an optimal solution for performing og ith less precision loss
-    private void generateRelinerizationKeys(Parameters parameters) {
+    private void generateRelinerizationKeysWithBaseDecompositionTechnique(Parameters parameters) {
         BigInteger ciphertextMod = parameters.getCiphertextModulus();
 
         //todo use the guava library to perform the operation must check if the squaring and logarithm operations
@@ -72,6 +88,7 @@ public class KeyGenerator {
         BigInteger base = RoundingOperations
                 .roundSquareRootToCeil(ciphertextMod, parameters.getCiphertextModulus().sqrt());
 
+        //todo - check the original operation - that takes the floor of log and adds one
         int levels = RoundingOperations.getRoundedLogarithmOfArbitraryBaseToFloor(ciphertextMod, base).intValue();
 
         BigInteger[] keys = new BigInteger[levels];
@@ -81,12 +98,17 @@ public class KeyGenerator {
         List<List<Polynomial>> keyTuples = new ArrayList<>();
 
         for (int i = 0; i < levels; i++) {
-            BigInteger[] randomCoefficients = SamplingOperations
-                    .normalSampling(BigInteger.ZERO, ciphertextMod, parameters.getPolynomialDegree().intValue());
+//            BigInteger[] randomCoefficients = SamplingOperations
+//                    .normalSampling(BigInteger.ZERO, ciphertextMod, parameters.getPolynomialDegree().intValue());
+
+            BigInteger[] randomCoefficients = turnIntToBigIntTestCases(new int []
+                    {589932605, 716706383, 659770923, 119525395, 65261581, 717314367, 111434568, 678875960});
 
             Polynomial k1 = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
-            BigInteger[] randomErrorCoefficients = SamplingOperations.triangleSample(parameters.getPolynomialDegree().intValue());
+           // BigInteger[] randomErrorCoefficients = SamplingOperations.triangleSample(parameters.getPolynomialDegree().intValue());
+
+            BigInteger[] randomErrorCoefficients = turnIntToBigIntTestCases(new int []{0, 0, 1, 0, 1, 1, -1, 1});
 
             Polynomial error = new Polynomial(parameters.getPolynomialDegree(), randomErrorCoefficients);
 
@@ -110,5 +132,17 @@ public class KeyGenerator {
         }
 
         this.relinearizationKeys = new RelinearizationKeys(base.intValue(), keyTuples);
+    }
+
+    public SecretKey getSecretKey() {
+        return secretKey;
+    }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public RelinearizationKeys getRelinearizationKeys() {
+        return relinearizationKeys;
     }
 }

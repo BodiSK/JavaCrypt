@@ -3,6 +3,8 @@ package scheme.bfv;
 
 import utils.structures.Ciphertext;
 import utils.structures.Polynomial;
+
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -14,12 +16,12 @@ public class Evaluator {
 
     private BigInteger plaintextModulus;
     private BigInteger cipherTextModulus;
-    private BigInteger scalingFactor;
+    private BigDecimal scalingFactor;
 
     public Evaluator(Parameters parameters) {
         this.plaintextModulus = parameters.getPlaintextModulus();
         this.cipherTextModulus = parameters.getCiphertextModulus();
-        this.scalingFactor = parameters.getScalingFactor().toBigInteger();
+        this.scalingFactor = parameters.getScalingFactor();
     }
 
 
@@ -30,7 +32,7 @@ public class Evaluator {
         Polynomial additionFirstPart = first.getEncryptionPolynomial().add(second.getEncryptionPolynomial(), this.cipherTextModulus);
         Polynomial additionSecondPart = first.getAdditionalComponent().add(second.getAdditionalComponent(), this.cipherTextModulus);
 
-        return  new Ciphertext(additionFirstPart, additionSecondPart, this.scalingFactor, this.cipherTextModulus);
+        return  new Ciphertext(additionFirstPart, additionSecondPart, this.scalingFactor.toBigInteger(), this.cipherTextModulus);
     }
 
     /**
@@ -41,26 +43,26 @@ public class Evaluator {
      * coefficient base decomposition.
      */
     public Ciphertext multiply(Ciphertext first, Ciphertext second, RelinearizationKeys relinearizationKeys) {
-        Polynomial c01 = first.getEncryptionPolynomial();
-        Polynomial c02 = second.getEncryptionPolynomial();
+        Polynomial c01 = first.getEncryptionPolynomial();//a0
+        Polynomial c02 = second.getEncryptionPolynomial();//b0
 
-        Polynomial c11 = first.getAdditionalComponent();
-        Polynomial c12 = second.getAdditionalComponent();
+        Polynomial c11 = first.getAdditionalComponent();//a1
+        Polynomial c12 = second.getAdditionalComponent();//b1
 
         Polynomial c0 = c01.multiplyFFT(c02)
-                .divideByScalar(scalingFactor, null)
+                .divideByNonIntegerScalar(scalingFactor, null)
                 .getCoefficientsMod(cipherTextModulus);
 
         Polynomial c1 = c01.multiplyFFT(c12)
                 .add(c11.multiplyFFT(c02), cipherTextModulus)
-                .divideByScalar(scalingFactor, null)
+                .divideByNonIntegerScalar(scalingFactor, null)
                 .getCoefficientsMod(cipherTextModulus);
 
-        Polynomial c2 = c02.multiplyFFT(c12)
-                .divideByScalar(scalingFactor, null)
+        Polynomial c2 = c11.multiplyFFT(c12)
+                .divideByNonIntegerScalar(scalingFactor, null)
                 .getCoefficientsMod(cipherTextModulus);
 
-        return null;
+        return relinearize(c0, c1, c2, relinearizationKeys);
     }
 
     /**
@@ -74,7 +76,7 @@ public class Evaluator {
 
         Polynomial[] decomposed = c2.decomposeCoefficients(base, levels);
 
-        Polynomial resultFirstPart =c0;
+        Polynomial resultFirstPart = c0;
         Polynomial resultSecondPart = c1;
 
         // Perform relinearization by combining the decomposed parts with relinearization keys.
@@ -90,6 +92,6 @@ public class Evaluator {
                             .multiply(decomposed[i], this.cipherTextModulus), this.cipherTextModulus);
         }
 
-        return new Ciphertext(resultFirstPart, resultSecondPart, this.scalingFactor, this.cipherTextModulus);
+        return new Ciphertext(resultFirstPart, resultSecondPart, this.scalingFactor.toBigInteger(), this.cipherTextModulus);
     }
 }

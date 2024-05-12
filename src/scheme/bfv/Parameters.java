@@ -3,6 +3,7 @@ package scheme.bfv;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 
 /**
@@ -20,7 +21,7 @@ public class Parameters {
         this.plaintextModulus = plaintextModulus;
         this.ciphertextModulus = ciphertextModulus;
 
-        this.scalingFactor = new BigDecimal(ciphertextModulus).divide(new BigDecimal(plaintextModulus), RoundingMode.HALF_EVEN);
+        this.scalingFactor = new BigDecimal(ciphertextModulus).divide(new BigDecimal(plaintextModulus),10, RoundingMode.HALF_EVEN);
     }
 
     public BigInteger getPolynomialDegree() {

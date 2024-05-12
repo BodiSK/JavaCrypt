@@ -56,10 +56,10 @@ public class RoundingOperations {
      * down
     */
     //todo rewrite using maths library Guava
-    public static BigInteger roundSquareRootToCeil(BigInteger value, BigInteger squared) {
-        return squared.multiply(squared).equals(value)
-                ? value
-                :value.add(BigInteger.ONE);
+    public static BigInteger roundSquareRootToCeil(BigInteger value, BigInteger squareRoot) {
+        return squareRoot.multiply(squareRoot).equals(value)
+                ? squareRoot
+                :squareRoot.add(BigInteger.ONE);
     }
 
 

@@ -46,7 +46,7 @@ public class Decryptor {
         }
 
         intermediateResult = intermediateResult
-                .divideByScalar(scalingFactor.toBigInteger(), null)
+                .divideByNonIntegerScalar(scalingFactor, null)
                 .getCoefficientsMod(this.plaintextModulus);
 
         return new Plaintext(intermediateResult, this.plaintextModulus);
