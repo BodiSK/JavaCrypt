@@ -19,8 +19,9 @@ public class TestHomomorphicOperations {
     public static void main(String[] args) {
 
         BigInteger polynomialDegree = new BigInteger("8");
-        BigInteger plaintextModulus = new BigInteger("257");
-        BigInteger ciphertextModulus = new BigInteger("799999999");
+        BigInteger plaintextModulus = new BigInteger("881");
+        //257, 337, 353, 401, 433, 449, 577, 593, 641, 673, 881,
+        BigInteger ciphertextModulus = new BigInteger("7999999999999999");
 
         Parameters parameters = new Parameters(polynomialDegree, plaintextModulus, ciphertextModulus);
 
@@ -50,7 +51,12 @@ public class TestHomomorphicOperations {
         Ciphertext ciphertextFirst = encryptor.encrypt(plaintextFirst);
         Ciphertext ciphertextSecond = encryptor.encrypt(plaintextSecond);
 
+        //two multiplications and one addition.
+        //check if batch encoder can perform operations without modular reduction
+        //todo develop a module to perform easier parameter selection
         Ciphertext result = evaluator.multiply(ciphertextFirst, ciphertextSecond, rk);
+        result = evaluator.add(ciphertextFirst, result);
+        result = evaluator.multiply(ciphertextSecond, result, rk);
 
         Plaintext decryptedResult = decryptor.decrypt(result, null);
 

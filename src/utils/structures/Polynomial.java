@@ -56,14 +56,14 @@ public class Polynomial {
             throw new UnsupportedOperationException("Degree of polynomials must be the same to perform addition");
         }
 
-        if(modulus == null) {
-            modulus = BigInteger.ONE;
-        }
-
         BigInteger[] result = new BigInteger[this.polynomialDegree.intValue()];
 
         for (int i = 0; i < this.coefficients.length; i++) {
-            result[i] = this.coefficients[i].add(polynomial.getCoefficients()[i]).mod(modulus);
+            result[i] = this.coefficients[i].add(polynomial.getCoefficients()[i]);
+
+            if(modulus != null) {
+                result[i] = result[i].mod(modulus);
+            }
         }
 
         return  new Polynomial(this.polynomialDegree, result);
@@ -347,20 +347,15 @@ public class Polynomial {
             throw new IllegalArgumentException("Scalar must be a valid value!");
         }
 
-        if(modulus == null) {
-            //if the modulus is null should assign it the value of the scalar
-            // thus the operation will take no effect
-            // in order to prevent modulus not positive exception, should take absolute value
-            modulus = scalar.abs();
-        }
 
         int degree = this.polynomialDegree.intValue();
         BigInteger[] scalarProductCoefficients = new BigInteger[degree];
 
         for (int i = 0; i < degree; i++) {
-            scalarProductCoefficients[i] = (coefficients[i].multiply(scalar));
-            //todo there will be an error if the scalar is 1
-            //.mod(modulus);
+            scalarProductCoefficients[i] = coefficients[i].multiply(scalar);
+            if(modulus != null) {
+                scalarProductCoefficients[i] = scalarProductCoefficients[i].mod(modulus);
+            }
         }
 
         return new Polynomial(polynomialDegree, scalarProductCoefficients);
@@ -371,11 +366,6 @@ public class Polynomial {
             throw new IllegalArgumentException("Scalar must be a valid value!");
         }
 
-        //todo apply fix. Mod(1) always returns zero!!!
-        if(modulus == null) {
-            modulus = scalar.abs();
-        }
-
         int degree = this.polynomialDegree.intValue();
         BigInteger[] scalarDivisionCoefficients = new BigInteger[degree];
 
@@ -383,7 +373,9 @@ public class Polynomial {
             scalarDivisionCoefficients[i] = AlgebraicOperations.performBigIntegerDivisionHalfDown(
                     coefficients[i],
                     scalar);
-                    //.mod(modulus);
+            if(modulus != null) {
+                scalarDivisionCoefficients[i] = scalarDivisionCoefficients[i].mod(modulus);
+            }
         }
 
         return new Polynomial(polynomialDegree, scalarDivisionCoefficients);
@@ -394,20 +386,15 @@ public class Polynomial {
             throw new IllegalArgumentException("Scalar must be a valid value!");
         }
 
-        if(modulus == null) {
-            //if the modulus is null should assign it the value of the scalar
-            // thus the operation will take no effect
-            // in order to prevent modulus not positive exception, should take absolute value
-            modulus = scalar.toBigInteger().abs();
-        }
-
         int degree = this.polynomialDegree.intValue();
         BigInteger[] scalarProductCoefficients = new BigInteger[degree];
 
         for (int i = 0; i < degree; i++) {
             scalarProductCoefficients[i] = (new BigDecimal(coefficients[i]).multiply(scalar, MathContext.DECIMAL128))
                     .toBigInteger();
-                    //.mod(modulus);
+            if(modulus != null) {
+                scalarProductCoefficients[i] = scalarProductCoefficients[i].mod(modulus);
+            }
         }
 
         return new Polynomial(polynomialDegree, scalarProductCoefficients);
@@ -418,10 +405,6 @@ public class Polynomial {
             throw new IllegalArgumentException("Scalar must be a valid value!");
         }
 
-        //todo apply fix. Mod(1) always returns zero!!!
-        if(modulus == null) {
-            modulus = scalar.toBigInteger().abs();
-        }
 
         int degree = this.polynomialDegree.intValue();
         BigInteger[] scalarDivisionCoefficients = new BigInteger[degree];
@@ -429,7 +412,9 @@ public class Polynomial {
         for (int i = 0; i < degree; i++) {
             scalarDivisionCoefficients[i] = new BigDecimal(coefficients[i]).divide(scalar, RoundingMode.HALF_DOWN)
                     .toBigInteger();
-                    //.mod(modulus);
+            if(modulus != null) {
+                scalarDivisionCoefficients[i] = scalarDivisionCoefficients[i].mod(modulus);
+            }
         }
 
         return new Polynomial(polynomialDegree, scalarDivisionCoefficients);

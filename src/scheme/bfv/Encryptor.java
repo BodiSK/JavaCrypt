@@ -34,6 +34,7 @@ public class Encryptor {
         Polynomial p0 = this.publicKey.getPk0();
         Polynomial p1 = this.publicKey.getPk1();
 
+        //todo hard code this
         Polynomial u = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree.intValue()));
         //todo - check this lines
         Polynomial e1 = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree.intValue()));

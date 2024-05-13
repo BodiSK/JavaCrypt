@@ -26,25 +26,15 @@ public class KeyGenerator {
         generateRelinerizationKeysWithBaseDecompositionTechnique(parameters);
     }
 
-    private BigInteger[] turnIntToBigIntTestCases(int [] array) {
-        // Convert each element to BigInteger
-        BigInteger[] bigIntegerArray = new BigInteger[array.length];
-        for (int i = 0; i < array.length; i++) {
-            bigIntegerArray[i] = BigInteger.valueOf(array[i]);
-        }
-        return bigIntegerArray;
-    }
-
 
     /**
      * Generates an instance of the secret key class as a random sequence of [-1, 0, 1]
      * using the triangular distribution
      */
     private void generateSecretKey(Parameters parameters) {
-//        BigInteger[] randomCoefficients = SamplingOperations
-//                .triangleSample(parameters.getPolynomialDegree().intValue());
+        BigInteger[] randomCoefficients = SamplingOperations
+                .triangleSample(parameters.getPolynomialDegree().intValue());
 
-        BigInteger[] randomCoefficients = turnIntToBigIntTestCases(new int []{0, -1, 0, 0, -1, 1, 0, 0});
 
         Polynomial secret = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
@@ -56,18 +46,15 @@ public class KeyGenerator {
      * The public key consists of a polynomial tuple, the first part is the masked secret and the second is a random polynomial.
      */
     private void generatePublicKey(Parameters parameters) {
-//        BigInteger[] randomCoefficients = SamplingOperations
-//                .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree().intValue());
+        //also known as a
+        BigInteger[] randomCoefficients = SamplingOperations
+                .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree().intValue());
 
-        BigInteger[] randomCoefficients = turnIntToBigIntTestCases(new int []
-                {459303238, 109894758, 436288360, 236934650, 385855700, 101980507, 170381229, 726689656});
 
         Polynomial randomPolynomial = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
-//        BigInteger[] randomError = SamplingOperations
-//                .triangleSample(parameters.getPolynomialDegree().intValue());
-
-        BigInteger[] randomError = turnIntToBigIntTestCases(new int []{1, -1, 0, -1, -1, -1, 0, 0});
+        BigInteger[] randomError = SamplingOperations
+                .triangleSample(parameters.getPolynomialDegree().intValue());
 
         Polynomial errorPolynomial = new Polynomial(parameters.getPolynomialDegree(), randomError);
 
@@ -98,17 +85,12 @@ public class KeyGenerator {
         List<List<Polynomial>> keyTuples = new ArrayList<>();
 
         for (int i = 0; i < levels; i++) {
-//            BigInteger[] randomCoefficients = SamplingOperations
-//                    .normalSampling(BigInteger.ZERO, ciphertextMod, parameters.getPolynomialDegree().intValue());
-
-            BigInteger[] randomCoefficients = turnIntToBigIntTestCases(new int []
-                    {589932605, 716706383, 659770923, 119525395, 65261581, 717314367, 111434568, 678875960});
+            BigInteger[] randomCoefficients = SamplingOperations
+                    .normalSampling(BigInteger.ZERO, ciphertextMod, parameters.getPolynomialDegree().intValue());
 
             Polynomial k1 = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
-           // BigInteger[] randomErrorCoefficients = SamplingOperations.triangleSample(parameters.getPolynomialDegree().intValue());
-
-            BigInteger[] randomErrorCoefficients = turnIntToBigIntTestCases(new int []{0, 0, 1, 0, 1, 1, -1, 1});
+            BigInteger[] randomErrorCoefficients = SamplingOperations.triangleSample(parameters.getPolynomialDegree().intValue());
 
             Polynomial error = new Polynomial(parameters.getPolynomialDegree(), randomErrorCoefficients);
 

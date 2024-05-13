@@ -43,18 +43,18 @@ public class Evaluator {
      * coefficient base decomposition.
      */
     public Ciphertext multiply(Ciphertext first, Ciphertext second, RelinearizationKeys relinearizationKeys) {
-        Polynomial c01 = first.getEncryptionPolynomial();//a0
-        Polynomial c02 = second.getEncryptionPolynomial();//b0
+        Polynomial c01 = first.getEncryptionPolynomial();//ciph1.c0
+        Polynomial c02 = second.getEncryptionPolynomial();//ciph2.c0
 
-        Polynomial c11 = first.getAdditionalComponent();//a1
-        Polynomial c12 = second.getAdditionalComponent();//b1
+        Polynomial c11 = first.getAdditionalComponent();//ciph1.c1
+        Polynomial c12 = second.getAdditionalComponent();//ciph2.c1
 
         Polynomial c0 = c01.multiplyFFT(c02)
                 .divideByNonIntegerScalar(scalingFactor, null)
                 .getCoefficientsMod(cipherTextModulus);
 
         Polynomial c1 = c01.multiplyFFT(c12)
-                .add(c11.multiplyFFT(c02), cipherTextModulus)
+                .add(c02.multiplyFFT(c11), null)
                 .divideByNonIntegerScalar(scalingFactor, null)
                 .getCoefficientsMod(cipherTextModulus);
 
