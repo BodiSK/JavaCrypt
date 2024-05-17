@@ -11,12 +11,12 @@ import java.math.RoundingMode;
  */
 public class Parameters {
 
-    private BigInteger polynomialDegree;
+    private int polynomialDegree;
     private BigInteger plaintextModulus;
     private BigInteger ciphertextModulus;
     private BigDecimal scalingFactor;
 
-    public Parameters(BigInteger polynomialDegree, BigInteger plaintextModulus, BigInteger ciphertextModulus) {
+    public Parameters(int polynomialDegree, BigInteger plaintextModulus, BigInteger ciphertextModulus) {
         this.polynomialDegree = polynomialDegree;
         this.plaintextModulus = plaintextModulus;
         this.ciphertextModulus = ciphertextModulus;
@@ -24,7 +24,7 @@ public class Parameters {
         this.scalingFactor = new BigDecimal(ciphertextModulus).divide(new BigDecimal(plaintextModulus),10, RoundingMode.HALF_EVEN);
     }
 
-    public BigInteger getPolynomialDegree() {
+    public int getPolynomialDegree() {
         return polynomialDegree;
     }
 

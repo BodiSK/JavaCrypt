@@ -15,7 +15,7 @@ import java.math.BigInteger;
  */
 public class Decryptor {
 
-    private BigInteger polynomialDegree;
+    private int polynomialDegree;
     private BigInteger plaintextModulus;
     private BigInteger ciphertextModulus;
     private BigDecimal scalingFactor;

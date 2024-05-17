@@ -2,8 +2,10 @@ package utils.structures;
 
 
 /**
- * A wrapper class for a Public Key instance
- *
+ * A wrapper class for a Public Key instance.
+ * An instance of the class is needed whenever there is an operation that needs to be performed on the ciphertext.
+ * Holds:
+ *      a tuple of polynomials corresponding to the two parts of the public key
  */
 public class PublicKey {
 
@@ -31,6 +33,3 @@ public class PublicKey {
                 ')';
     }
 }
-
-//TODO fix namings
-//TODO there might be a need to add the modulus of the space from which the PubliKey is taken

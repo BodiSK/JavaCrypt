@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class TestEncoder {
     public static void main(String[] args) {
 
-        BigInteger polynomialDegree = BigInteger.valueOf(8);
+        int polynomialDegree = 8;
         BigInteger plainTextMod = BigInteger.valueOf(17);
         BigInteger cipherTextMod = new BigInteger("3fffffff000001", 16);
 
@@ -22,7 +22,7 @@ public class TestEncoder {
 
         BatchEncoder encoder = new BatchEncoder(params);
 
-        BigInteger[] toTest = SamplingOperations.normalSampling(BigInteger.ZERO, plainTextMod, polynomialDegree.intValue());
+        BigInteger[] toTest = SamplingOperations.normalSampling(BigInteger.ZERO, plainTextMod, polynomialDegree);
 
         //test encode decode
         Plaintext encodedPlaintext =  encoder.encode(toTest);

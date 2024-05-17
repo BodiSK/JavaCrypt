@@ -18,14 +18,14 @@ import java.math.BigInteger;
  */
 public class BatchEncoder {
 
-    private BigInteger polynomialDegree;
+    private int polynomialDegree;
     private BigInteger plaintextModulus;
     private NumberTheoreticTransform numberTheoreticTransform;
 
     public BatchEncoder(Parameters parameters) {
         this.polynomialDegree = parameters.getPolynomialDegree();
         this.plaintextModulus = parameters.getPlaintextModulus();
-        this.numberTheoreticTransform = new NumberTheoreticTransform(polynomialDegree, plaintextModulus);
+        this.numberTheoreticTransform = new NumberTheoreticTransform(BigInteger.valueOf(polynomialDegree), plaintextModulus);
     }
 
 
@@ -38,7 +38,7 @@ public class BatchEncoder {
      */
     public Plaintext encode(BigInteger[] toEncode) {
 
-        if(toEncode.length != this.polynomialDegree.intValue()) {
+        if(toEncode.length != this.polynomialDegree) {
             throw  new IllegalArgumentException("In order to perform encoding correctly the values to be encoded must be as many" +
                     "as the degree of the of the ring in which they are to be transformed!");
         }

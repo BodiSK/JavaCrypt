@@ -8,6 +8,7 @@ import utils.structures.PublicKey;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * A class encapsulating the logic for encryption a message.
@@ -16,7 +17,7 @@ import java.math.BigInteger;
  */
 public class Encryptor {
 
-    private BigInteger polynomialDegree;
+    private int polynomialDegree;
     private BigInteger modulus;
     private PublicKey publicKey;
     private BigInteger delta;
@@ -35,10 +36,10 @@ public class Encryptor {
         Polynomial p1 = this.publicKey.getPk1();
 
         //todo hard code this
-        Polynomial u = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree.intValue()));
+        Polynomial u = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree));
         //todo - check this lines
-        Polynomial e1 = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree.intValue()));
-        Polynomial e2 = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree.intValue()));
+        Polynomial e1 = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree));
+        Polynomial e2 = new Polynomial(polynomialDegree, SamplingOperations.triangleSample(this.polynomialDegree));
 
         Polynomial scaledMessage = message.getPolynomial().multiplyByScalar(delta, this.modulus);
 

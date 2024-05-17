@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class TestHomomorphicOperations {
     public static void main(String[] args) {
 
-        BigInteger polynomialDegree = new BigInteger("8");
+        int polynomialDegree = 8;
         BigInteger plaintextModulus = new BigInteger("881");
         //257, 337, 353, 401, 433, 449, 577, 593, 641, 673, 881,
         BigInteger ciphertextModulus = new BigInteger("7999999999999999");

@@ -3,6 +3,11 @@ degree = 8;
 plaintext = 257
 ciphertext = 799 999 999
 
-multiplication followed by addition
+multiplication, addition, multiplication
 
-TODO - DEBUG AND FIND THE ERROR FOR WHICH THE CODE IS NOT WORKING - MUST ACHIEVE A WORKING VERSION OF MULTIPLICATION FOLLOWED BY ADDITION
+
+Todo:
+1. Implement homomorphic comparison and homomorphic subtraction
+2. Create a more friendly interface of the scheme to work with and override the default operations - add, mult, compare, subtr
+3. Improve the noise growth using https://eprint.iacr.org/2021/204.pdf  and the RNS representation
+

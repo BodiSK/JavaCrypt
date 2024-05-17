@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class TestDecryptEncrypt {
     public static void main(String[] args) {
-        BigInteger polynomialDegree = new BigInteger("8");
+        int polynomialDegree = 8;
         BigInteger plaintextModulus = new BigInteger("257");
         BigInteger ciphertextModulus = new BigInteger("65537");
 

@@ -1,5 +1,9 @@
 package tests;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import utils.Utilities;
 import utils.operations.AlgebraicOperations;
 import utils.optimizations.ChineseRemainderTheorem;
 import utils.optimizations.NumberTheoreticTransform;
@@ -9,155 +13,153 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 public class TestPolynomial {
-    public static void main(String[] args) {
 
-//        //Test subtract
-//        BigInteger degree = new BigInteger("5");
-//        BigInteger modulus = new BigInteger("60");
-//
-//        BigInteger[] polynomialACoeffs = new BigInteger[5];
-//        //0, 1, 4, 5, 59
-//        polynomialACoeffs[4] = new BigInteger("0");
-//        polynomialACoeffs[3] = new BigInteger("1");
-//        polynomialACoeffs[2] = new BigInteger("4");
-//        polynomialACoeffs[1] = new BigInteger("5");
-//        polynomialACoeffs[0] = new BigInteger("59");
-//
-//        BigInteger[] polynomialBCoeffs = new BigInteger[5];
-//        //1, 2, 4, 3, 2
-//        polynomialBCoeffs[4] = new BigInteger("1");
-//        polynomialBCoeffs[3] = new BigInteger("2");
-//        polynomialBCoeffs[2] = new BigInteger("4");
-//        polynomialBCoeffs[1] = new BigInteger("3");
-//        polynomialBCoeffs[0] = new BigInteger("2");
-//
-//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
-//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
-//
-//        Polynomial subtractionResult = a.subtract(b, modulus);
-        //this works well because of the way the mod operation in BigInteger class is defined in Java
-//        System.out.println(subtractionResult.toString());
+    private Polynomial first;
+    private Polynomial second;
+    private Polynomial multiplicandFirst;
+    private Polynomial multiplicandSecond;
+    private BigInteger modulus;
+    private BigInteger primeModulus;
+    private int powerOfTwoDegree;
+    private int degree;
 
+    private ChineseRemainderTheorem initializeCRTObject() {
+        BigInteger primeSize = BigInteger.valueOf(59);
 
+        int numberOfPrimes = AlgebraicOperations.performBigIntegerDivisionHalfDown(
+                        BigInteger.valueOf(102),
+                        primeSize)
+                .intValue();
 
-        //Test fast multiplication with number theoretic transform
-//        BigInteger degree = new BigInteger("4");
-//        BigInteger modulus = new BigInteger("73");
-//
-//        BigInteger[] polynomialACoeffs = new BigInteger[4];
-//        //0, 1, 4, 5
-//        polynomialACoeffs[0] = new BigInteger("0");
-//        polynomialACoeffs[1] = new BigInteger("1");
-//        polynomialACoeffs[2] = new BigInteger("4");
-//        polynomialACoeffs[3] = new BigInteger("5");
-//
-//        BigInteger[] polynomialBCoeffs = new BigInteger[4];
-//        //1, 2, 4, 3
-//        polynomialBCoeffs[0] = new BigInteger("1");
-//        polynomialBCoeffs[1] = new BigInteger("2");
-//        polynomialBCoeffs[2] = new BigInteger("4");
-//        polynomialBCoeffs[3] = new BigInteger("3");
-//
-//        NumberTheoreticTransform transform = new NumberTheoreticTransform(degree, modulus);
-//
-//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
-//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
-//
-//        Polynomial multiplicationResult = a.multiplyNTT(b, transform);
-//        Polynomial standardMultiplicationResult = a.multiply(b, modulus);
-//        System.out.println(multiplicationResult.toString());
-//        System.out.println(standardMultiplicationResult.toString());
+        return new ChineseRemainderTheorem(BigInteger.valueOf(powerOfTwoDegree), primeSize.intValue(), numberOfPrimes);
+    }
 
-        //Test fast multiplication with chinese remainder theorem
+    @Before
+    public void setUp() {
+        degree = 5;
+        modulus = new BigInteger("60");
 
-//        BigInteger mod = BigInteger.valueOf(1<<10);
-//        BigInteger primeSize = BigInteger.valueOf(59);
-//        BigInteger polynomialDegree = BigInteger.valueOf(1<<2);
-//
-//        int numberOfPrimes = AlgebraicOperations.performBigIntegerDivisionHalfDown(
-//                BigInteger.valueOf(2+ 2 +4*10 + 58),
-//                primeSize)
-//                .intValue();
-//        ChineseRemainderTheorem chineseRemainderTheorem = new ChineseRemainderTheorem(polynomialDegree, 59, numberOfPrimes);
-//
-//        BigInteger degree = new BigInteger("4");
-//        BigInteger modulus = new BigInteger("73");
-//
-//        BigInteger[] polynomialACoeffs = new BigInteger[4];
-//        //0, 1, 4, 5
-//        polynomialACoeffs[0] = new BigInteger("0");
-//        polynomialACoeffs[1] = new BigInteger("1");
-//        polynomialACoeffs[2] = new BigInteger("4");
-//        polynomialACoeffs[3] = new BigInteger("5");
-//
-//        BigInteger[] polynomialBCoeffs = new BigInteger[4];
-//        //1, 2, 4, 3
-//        polynomialBCoeffs[0] = new BigInteger("1");
-//        polynomialBCoeffs[1] = new BigInteger("2");
-//        polynomialBCoeffs[2] = new BigInteger("4");
-//        polynomialBCoeffs[3] = new BigInteger("3");
-//
-//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
-//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
-//
-//        Polynomial crtProduct = a.multiplyCRT(b, chineseRemainderTheorem);
-//        Polynomial result = crtProduct.applySmallRoundingToCoefficients(mod);
-//        Polynomial actual = a.multiply(b, mod).applySmallRoundingToCoefficients(mod);
-//
-//        System.out.println(result.toString());
-//        System.out.println(actual.toString());
+        //first polynomial 60 + 5x + 4x^2 + x^3
+        BigInteger[] polynomialFirstCoefficients = Utilities.transformArrayValuesTo(new int[]{60, 5, 4, 1, 0});
+        //second polynomial 2 + 3x + 4x^2 + 2x^3 + x^4
+        BigInteger[] polynomialSecondCoefficients = Utilities.transformArrayValuesTo(new int[]{2, 3, 4, 2, 1});
 
+        //setup for basic operations
+        first = new Polynomial(degree, polynomialFirstCoefficients);
+        second = new Polynomial(degree, polynomialSecondCoefficients);
 
-        //test polynomial multiplication with fast fourier transform
-//        BigInteger degree = new BigInteger("4");
-//        BigInteger modulus = new BigInteger("73");
-//
-//        BigInteger[] polynomialACoeffs = new BigInteger[4];
-//        //0, 1, 4, 5
-//        polynomialACoeffs[0] = new BigInteger("0");
-//        polynomialACoeffs[1] = new BigInteger("1");
-//        polynomialACoeffs[2] = new BigInteger("4");
-//        polynomialACoeffs[3] = new BigInteger("5");
-//
-//        BigInteger[] polynomialBCoeffs = new BigInteger[4];
-//        //1, 2, 4, 3
-//        polynomialBCoeffs[0] = new BigInteger("1");
-//        polynomialBCoeffs[1] = new BigInteger("2");
-//        polynomialBCoeffs[2] = new BigInteger("4");
-//        polynomialBCoeffs[3] = new BigInteger("3");
-//
-//
-//        Polynomial a = new Polynomial(degree, polynomialACoeffs);
-//        Polynomial b = new Polynomial(degree, polynomialBCoeffs);
-//
-//        Polynomial multiplicationResult = a.multiplyFFT(b);
-//        Polynomial standardMultiplicationResult = a.multiply(b, modulus);
-//        System.out.println(multiplicationResult.toString());
-//        System.out.println(standardMultiplicationResult.toString());
-//        System.out.println(standardMultiplicationResult.divideByScalar(degree, modulus).toString());
+        powerOfTwoDegree = 4;
+        primeModulus = BigInteger.valueOf(73);
 
+        //first multiplicand x + 4x^2 + 5x^3
+        BigInteger[] multiplicandFirstCoefficients = Utilities.transformArrayValuesTo(new int[]{0, 1, 4, 5});
 
+        //first multiplicand 1 + 2x + 4x^2 + 3x^3
+        BigInteger[] multiplicandSecondCoefficients = Utilities.transformArrayValuesTo(new int[]{1, 2, 4, 3});
 
-        //test base decompose method
-        BigInteger degree = new BigInteger("5");
-        BigInteger modulus = new BigInteger("73");
-
-        BigInteger[] polynomialACoeffs = new BigInteger[5];
-        //0, 1, 4, 5, 59
-        polynomialACoeffs[0] = new BigInteger("0");
-        polynomialACoeffs[1] = new BigInteger("1");
-        polynomialACoeffs[2] = new BigInteger("4");
-        polynomialACoeffs[3] = new BigInteger("5");
-        polynomialACoeffs[4] = new BigInteger("59");
-
-        Polynomial a = new Polynomial(degree, polynomialACoeffs);
-        BigInteger evalAtFive = a.evaluateOnValue(BigInteger.valueOf(5));
-        System.out.println(evalAtFive);
-
-        Polynomial[] result = a.decomposeCoefficients(8, 2);
-        for (int i = 0; i < 2; i++) {
-            System.out.println(result[i].toString());
-        }
+        //setup for optimized multiplication operations
+        multiplicandFirst = new Polynomial(powerOfTwoDegree, multiplicandFirstCoefficients);
+        multiplicandSecond = new Polynomial(powerOfTwoDegree, multiplicandSecondCoefficients);
 
     }
+
+    @Test
+    public void testAddition() {
+        Polynomial actual = first.add(second, modulus);
+        // expected result polynomial 2 + 8x + 8x^2 + 3x^3 + x^4
+        Polynomial expected = new Polynomial(degree, Utilities.transformArrayValuesTo(new int[] {2, 8, 8, 3, 1}));
+
+        Assert.assertEquals(actual, expected);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testAdditionWithNotMatchingLengthException() {
+        BigInteger[] coefficients = new BigInteger[degree+1];
+        Arrays.fill(coefficients, BigInteger.ONE);
+
+        Polynomial result = first.add(new Polynomial(degree+1, coefficients), modulus);
+    }
+
+    @Test
+    public void testSubtraction() {
+        Polynomial actual = first.subtract(second, modulus);
+        // expected result polynomial 58 + 2x + 0x^2 + -x^3 + -x^4 transformed with modular arithmetic mod 60
+        // --> 58 + 2x + 59x^3 + 59x^4
+        Polynomial expected = new Polynomial(degree, Utilities.transformArrayValuesTo(new int[] {58, 2, 0, 59, 59}));
+
+        Assert.assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testSubtractionWithoutModReduction() {
+        Polynomial actual = first.subtract(second);
+        // expected result polynomial 58 + 2x + 0x^2 + -x^3 + -x^4
+        Polynomial expected = new Polynomial(degree, Utilities.transformArrayValuesTo(new int[] {58, 2, 0, -1, -1}));
+
+        Assert.assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testMultiplication() {
+        Polynomial actual = first.multiply(second, modulus);
+
+        // expected result polynomial 29x^4 + 34x^3 + 22x^2 + 4x + 43
+        Polynomial expected = new Polynomial(degree, Utilities.transformArrayValuesTo(new int[] {43, 4, 22, 34, 29}));
+
+        Assert.assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testNTTMultiplication() {
+        NumberTheoreticTransform numberTheoreticTransform =
+                new NumberTheoreticTransform(BigInteger.valueOf(powerOfTwoDegree), primeModulus);
+
+        Polynomial actual = multiplicandFirst.multiplyNTT(multiplicandSecond, numberTheoreticTransform);
+        Polynomial expected = multiplicandFirst.multiply(multiplicandSecond, primeModulus);
+
+        Assert.assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void testCRTMultiplication() {
+        ChineseRemainderTheorem chineseRemainderTheorem = initializeCRTObject();
+
+        Polynomial actual = multiplicandFirst.multiplyCRT(multiplicandSecond, chineseRemainderTheorem).getCoefficientsMod(primeModulus);
+
+        Polynomial expected = multiplicandFirst.multiply(multiplicandSecond, primeModulus);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCRTParallelMultiplication() {
+
+        ChineseRemainderTheorem chineseRemainderTheorem = initializeCRTObject();
+
+        Polynomial actual = multiplicandFirst.multiplyCRTParallel(multiplicandSecond, chineseRemainderTheorem);
+
+        Polynomial expected = multiplicandFirst.multiplyCRT(multiplicandSecond, chineseRemainderTheorem);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testFFTMultiplication() {
+        Polynomial actual = multiplicandFirst.multiplyFFT(multiplicandSecond);
+
+        Polynomial expected = multiplicandFirst
+                .multiply(multiplicandSecond, primeModulus)
+                .applySmallModularReduction(primeModulus);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testEvaluateOn() {
+        BigInteger actual = multiplicandSecond.evaluateOnValue(BigInteger.valueOf(5));
+
+        Assert.assertEquals(actual, BigInteger.valueOf(486));
+    }
+
 }

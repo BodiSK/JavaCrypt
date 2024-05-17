@@ -1,6 +1,7 @@
 package utils;
 
 import java.lang.reflect.Array;
+import java.math.BigInteger;
 
 /**
  * A class that contains utility functions such as array manipulation.
@@ -40,5 +41,20 @@ public class Utilities {
         System.arraycopy(secondArray, 0, result, firstLength, secondLength);
 
         return result;
+    }
+
+
+    /**
+     * Utility function to convert an array of integer types to an array with the same values
+     * wrapped in BigInteger type.
+     */
+    public static BigInteger[] transformArrayValuesTo(int[] array) {
+
+        BigInteger[] bigIntArray = new BigInteger[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            bigIntArray[i] = BigInteger.valueOf(array[i]);
+        }
+        return bigIntArray;
     }
 }

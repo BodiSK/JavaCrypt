@@ -1,9 +1,13 @@
 package utils.structures;
 
+//todo check out
+//import java.security.PrivateKey;
 
 /**
- * A wrapper class for a Secret Key instance
- *
+ * A wrapper class for a Secret Key instance.
+ * An instance of the class is needed for encryption and decryption only.
+ * Holds:
+ *      a single polynomial
  */
 public class SecretKey {
 
@@ -23,6 +27,3 @@ public class SecretKey {
                 " )";
     }
 }
-
-
-//import java.security.PrivateKey;

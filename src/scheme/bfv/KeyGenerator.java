@@ -9,6 +9,7 @@ import utils.structures.SecretKey;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A class encapsulating the logic for private and public key generation.
@@ -33,7 +34,7 @@ public class KeyGenerator {
      */
     private void generateSecretKey(Parameters parameters) {
         BigInteger[] randomCoefficients = SamplingOperations
-                .triangleSample(parameters.getPolynomialDegree().intValue());
+                .triangleSample(parameters.getPolynomialDegree());
 
 
         Polynomial secret = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
@@ -48,13 +49,13 @@ public class KeyGenerator {
     private void generatePublicKey(Parameters parameters) {
         //also known as a
         BigInteger[] randomCoefficients = SamplingOperations
-                .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree().intValue());
+                .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree());
 
 
         Polynomial randomPolynomial = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
         BigInteger[] randomError = SamplingOperations
-                .triangleSample(parameters.getPolynomialDegree().intValue());
+                .triangleSample(parameters.getPolynomialDegree());
 
         Polynomial errorPolynomial = new Polynomial(parameters.getPolynomialDegree(), randomError);
 
@@ -86,11 +87,11 @@ public class KeyGenerator {
 
         for (int i = 0; i < levels; i++) {
             BigInteger[] randomCoefficients = SamplingOperations
-                    .normalSampling(BigInteger.ZERO, ciphertextMod, parameters.getPolynomialDegree().intValue());
+                    .normalSampling(BigInteger.ZERO, ciphertextMod, parameters.getPolynomialDegree());
 
             Polynomial k1 = new Polynomial(parameters.getPolynomialDegree(), randomCoefficients);
 
-            BigInteger[] randomErrorCoefficients = SamplingOperations.triangleSample(parameters.getPolynomialDegree().intValue());
+            BigInteger[] randomErrorCoefficients = SamplingOperations.triangleSample(parameters.getPolynomialDegree());
 
             Polynomial error = new Polynomial(parameters.getPolynomialDegree(), randomErrorCoefficients);
 

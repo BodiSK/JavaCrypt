@@ -6,8 +6,9 @@ import java.math.BigInteger;
 
 /**
  * A wrapper class for Plaintext from RLWE based homomorphic scheme
- * holds a single polynomial representing a plaintext from Zt[X]/(X^d+1)
- * and modulus t
+ * holds:
+ *      a single polynomial representing a plaintext from Zt[X]/(X^d+1)
+ *      and modulus t
  */
 public class Plaintext {
 
