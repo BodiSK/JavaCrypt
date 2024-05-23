@@ -35,6 +35,28 @@ public class Evaluator {
         return  new Ciphertext(additionFirstPart, additionSecondPart, this.scalingFactor.toBigInteger(), this.cipherTextModulus);
     }
 
+
+    /**
+     * Performs homomomorphic subtraction on two ciphertexts by subtracting each of the corresponding part of the ciphertext polynomial tuple.
+     * Since there is a possibility that the result is negative, smallMod operation should be performed instead of standard modular reduction
+     * to fit the range [-q/2, q/2).
+     */
+    public Ciphertext subtract(Ciphertext first, Ciphertext second) {
+        Polynomial additionFirstPart = first.getEncryptionPolynomial()
+                .subtract(second.getEncryptionPolynomial(), null)
+                .applySmallModularReduction(cipherTextModulus);
+
+        Polynomial additionSecondPart = first.getAdditionalComponent()
+                .subtract(second.getAdditionalComponent(), null)
+                .applySmallModularReduction(cipherTextModulus);
+
+        return  new Ciphertext(additionFirstPart,
+                additionSecondPart,
+                this.scalingFactor.toBigInteger(),
+                this.cipherTextModulus,
+                true);
+    }
+
     /**
      * Performs homomomorphic multiplication on two ciphertexts.
      * Each part of the first ciphertext polynomial tuple is multiplied with fast multiplication using FFT
@@ -70,7 +92,7 @@ public class Evaluator {
      * by substituting the tree parts c0, c1, c2 with such polynomials c0', c1' that have the same result when evaluated.
      */
     private Ciphertext relinearize(Polynomial c0, Polynomial c1, Polynomial c2, RelinearizationKeys relinearizationKeys) {
-        int base = relinearizationKeys.getBase();
+        BigInteger base = relinearizationKeys.getBase();
         List<List<Polynomial>> keys = relinearizationKeys.getKeys();
         int levels = keys.size();
 

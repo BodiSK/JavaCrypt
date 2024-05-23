@@ -15,12 +15,28 @@ public class Ciphertext {
     private Polynomial additionalComponent; //c1
     private BigInteger scalingFactor;
     private BigInteger modulus;
+    private boolean decryptInSmallDomain;
 
-    public Ciphertext(Polynomial encryptionPolynomial, Polynomial additionalComponent, BigInteger scalingFactor, BigInteger modulus) {
+    public Ciphertext(Polynomial encryptionPolynomial,
+                      Polynomial additionalComponent,
+                      BigInteger scalingFactor,
+                      BigInteger modulus) {
         this.encryptionPolynomial = encryptionPolynomial;
         this.additionalComponent = additionalComponent;
         this.scalingFactor = scalingFactor;
         this.modulus = modulus;
+        this.decryptInSmallDomain = false;
+    }
+    public Ciphertext(Polynomial encryptionPolynomial,
+                      Polynomial additionalComponent,
+                      BigInteger scalingFactor,
+                      BigInteger modulus,
+                      boolean decryptInSmallDomain) {
+        this.encryptionPolynomial = encryptionPolynomial;
+        this.additionalComponent = additionalComponent;
+        this.scalingFactor = scalingFactor;
+        this.modulus = modulus;
+        this.decryptInSmallDomain = decryptInSmallDomain;
     }
 
     public Polynomial getEncryptionPolynomial() {

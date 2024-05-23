@@ -114,7 +114,7 @@ public class KeyGenerator {
 
         }
 
-        this.relinearizationKeys = new RelinearizationKeys(base.intValue(), keyTuples);
+        this.relinearizationKeys = new RelinearizationKeys(base, keyTuples);
     }
 
     public SecretKey getSecretKey() {

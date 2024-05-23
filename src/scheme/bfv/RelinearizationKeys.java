@@ -3,6 +3,7 @@ package scheme.bfv;
 
 import utils.structures.Polynomial;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -11,15 +12,15 @@ import java.util.List;
  */
 public class RelinearizationKeys {
 
-    private int base;
+    private BigInteger base;
     private List<List<Polynomial>> keys;
 
-    public RelinearizationKeys(int base, List<List<Polynomial>> keys) {
+    public RelinearizationKeys(BigInteger base, List<List<Polynomial>> keys) {
         this.base = base;
         this.keys = keys;
     }
 
-    public int getBase() {
+    public BigInteger getBase() {
         return base;
     }
 

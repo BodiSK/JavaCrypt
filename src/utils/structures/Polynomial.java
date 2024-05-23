@@ -511,13 +511,13 @@ public class Polynomial {
      *
      * @return an array of polynomials
      */
-    public Polynomial[] decomposeCoefficients(int base, int levels) {
+    public Polynomial[] decomposeCoefficients(BigInteger base, int levels) {
         Polynomial[] result = new Polynomial[levels];
         Polynomial polynomial = new Polynomial(this.polynomialDegree, this.coefficients);
 
         for (int i = 0; i < levels; i++) {
-            result[i] = polynomial.getCoefficientsMod(BigInteger.valueOf(base));
-            polynomial = polynomial.divideByScalar(BigInteger.valueOf(base), null);
+            result[i] = polynomial.getCoefficientsMod(base);
+            polynomial = polynomial.divideByScalar(base, null);
         }
 
         return result;

@@ -144,3 +144,7 @@ IntStream.range(0, this.polynomialDegree)
                 .collect(Collectors.joining(" + "));
 
 Also benchmark the efficiency of parallel stream - CRT is the mpst time consuming method - this is the motivation to search for alternatives
+
+
+20.05:
+Optimize functionality - if unable to perform batching at once, split the data into multiple small-length pieces
