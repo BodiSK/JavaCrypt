@@ -3,6 +3,7 @@ package scheme.bfv;
 
 import utils.structures.Polynomial;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * A class representing a relinearization key tuple.
  * It is used to perform the relinearization step that is necessary to prevent the exponential growth of the ciphertext.
  */
-public class RelinearizationKeys {
+public class RelinearizationKeys implements Serializable {
 
     private BigInteger base;
     private List<List<Polynomial>> keys;

@@ -3,13 +3,15 @@ package utils.structures;
 //todo check out
 //import java.security.PrivateKey;
 
+import java.io.Serializable;
+
 /**
  * A wrapper class for a Secret Key instance.
  * An instance of the class is needed for encryption and decryption only.
  * Holds:
  *      a single polynomial
  */
-public class SecretKey {
+public class SecretKey implements Serializable {
 
     private Polynomial secret;
 

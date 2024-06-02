@@ -1,12 +1,13 @@
-package GUI;
+package GUI.use.tab;
 
 import scheme.bfv.*;
-import utils.structures.*;
+import utils.structures.Ciphertext;
+import utils.structures.Plaintext;
+import utils.structures.PublicKey;
+import utils.structures.SecretKey;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -14,10 +15,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-class UseCasesPanel extends JPanel {
+public class KeyGenEncPanel extends JPanel {
 
-    private CardLayout cardLayout;
-    private JPanel cardPanel;
     private JTextField lambdaField;
     private JTextField polyModulusDegreeField;
     private JTextField plaintextModulusField;
@@ -34,82 +33,67 @@ class UseCasesPanel extends JPanel {
     private Decryptor decryptor;
     private Evaluator evaluator;
     private Ciphertext lastCiphertext;
-    private JButton nextButton;
-    private JButton previousButton;
-    private JButton finishButton;
-    private int currentStep = 0;
-
-    private JPanel keyOptionsPanel;
-    private JPanel parameterInputPanel;
     private JButton saveKeysButton;
+    private BigInteger lastPlaintextModulus;
+    private JLabel customInputLabel;
+    private JButton loadCsvButton;
+    private JButton saveButton;
+    private JButton nextButton;
+    private JButton prevButton;
+    private CardLayout cardLayout;
+    private JPanel cardPanel;
+    private JPanel parameterInputPanel;
 
-    public UseCasesPanel() {
+    public KeyGenEncPanel(JTextArea outputArea) {
+        this.outputArea = outputArea;
         setLayout(new BorderLayout());
-
+        initializeFileChooser();
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // Initialize fileChooser
-        fileChooser = new JFileChooser();
+        JPanel keyGenPanel = createKeyGenPanel();
+        JPanel encryptPanel = createEncryptPanel();
 
-        // Step panels
-        JPanel step1Panel = createStep1Panel();
-        JPanel step2Panel = createStep2Panel();
-        JPanel step3Panel = createStep3Panel();
-        JPanel step4Panel = createStep4Panel();
-        JPanel step5Panel = createStep5Panel();
+        cardPanel.add(keyGenPanel, "KeyGen");
+        cardPanel.add(encryptPanel, "Encrypt");
 
-        cardPanel.add(step1Panel, "Step1");
-        cardPanel.add(step2Panel, "Step2");
-        cardPanel.add(step3Panel, "Step3");
-        cardPanel.add(step4Panel, "Step4");
-        cardPanel.add(step5Panel, "Step5");
-
-        JPanel wizardPanel = new JPanel(new BorderLayout());
-        wizardPanel.add(cardPanel, BorderLayout.NORTH);
+        add(cardPanel, BorderLayout.CENTER);
 
         JPanel navigationPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        previousButton = new JButton("Previous");
-        previousButton.addActionListener(e -> showPreviousStep());
-        navigationPanel.add(previousButton);
+        prevButton = new JButton("Previous");
+        prevButton.addActionListener(e -> cardLayout.show(cardPanel, "KeyGen"));
         nextButton = new JButton("Next");
-        nextButton.addActionListener(e -> showNextStep());
+        nextButton.addActionListener(e -> cardLayout.show(cardPanel, "Encrypt"));
+        saveButton = new JButton("Save to File");
+        saveButton.addActionListener(e -> saveCiphertextToFile());
+        saveButton.setVisible(false);
+
+        navigationPanel.add(prevButton);
         navigationPanel.add(nextButton);
-        finishButton = new JButton("Finish");
-        finishButton.addActionListener(e -> finishWizard());
-        navigationPanel.add(finishButton);
-        wizardPanel.add(navigationPanel, BorderLayout.SOUTH);
+        navigationPanel.add(saveButton);
 
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(wizardPanel, BorderLayout.NORTH);
-
-        add(leftPanel, BorderLayout.WEST);
-
-        // Console output area
-        outputArea = new JTextArea(20, 30);
-        outputArea.setEditable(false);
-        outputArea.setBackground(Color.BLACK);
-        outputArea.setForeground(Color.WHITE);
-        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        JScrollPane scrollPane = new JScrollPane(outputArea);
-        add(scrollPane, BorderLayout.CENTER);
-
-        updateNavigationButtons();
+        add(navigationPanel, BorderLayout.SOUTH);
     }
 
-    private JPanel createStep1Panel() {
+    private void initializeFileChooser() {
+        fileChooser = new JFileChooser();
+    }
+
+    private JPanel createKeyGenPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Key Generation Section
         JPanel keyGenSection = new JPanel(new BorderLayout());
         keyGenSection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Key Generation"));
 
-        keyOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel keyOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JRadioButton loadKeysRadio = new JRadioButton("Load Keys from File");
-        loadKeysRadio.addActionListener(e -> toggleParameterInput(false, false));
+        loadKeysRadio.addActionListener(e -> {
+            toggleParameterInput(false);
+            loadKeysFromFile();
+        });
         JRadioButton generateKeysRadio = new JRadioButton("Generate Keys");
-        generateKeysRadio.addActionListener(e -> toggleParameterInput(true, false));
+        generateKeysRadio.addActionListener(e -> toggleParameterInput(true));
         ButtonGroup keyOptionsGroup = new ButtonGroup();
         keyOptionsGroup.add(loadKeysRadio);
         keyOptionsGroup.add(generateKeysRadio);
@@ -122,7 +106,7 @@ class UseCasesPanel extends JPanel {
         parameterInputPanel.setLayout(new BoxLayout(parameterInputPanel, BoxLayout.Y_AXIS));
 
         JPanel lambdaInputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lambdaInputPanel.add(new JLabel("Lambda:"));
+        lambdaInputPanel.add(new JLabel("Security input parameter (lambda):"));
         lambdaField = new JTextField(10);
         lambdaInputPanel.add(lambdaField);
         JButton generateParamsButton = new JButton("Generate Parameters from Lambda");
@@ -135,8 +119,14 @@ class UseCasesPanel extends JPanel {
         polyModulusDegreeField = new JTextField(10);
         manualParamsPanel.add(polyModulusDegreeField);
         manualParamsPanel.add(new JLabel("Plaintext Modulus:"));
+        JPanel plaintextModulusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         plaintextModulusField = new JTextField(10);
-        manualParamsPanel.add(plaintextModulusField);
+        JButton nextPlaintextButton = new JButton("→");
+        nextPlaintextButton.setToolTipText("Generate next possible plaintext modulus");
+        nextPlaintextButton.addActionListener(e -> generateNextPlaintextModulus());
+        plaintextModulusPanel.add(plaintextModulusField);
+        plaintextModulusPanel.add(nextPlaintextButton);
+        manualParamsPanel.add(plaintextModulusPanel);
         manualParamsPanel.add(new JLabel("Ciphertext Modulus:"));
         ciphertextModulusField = new JTextField(10);
         manualParamsPanel.add(ciphertextModulusField);
@@ -157,85 +147,82 @@ class UseCasesPanel extends JPanel {
         keyGenSection.add(parameterInputPanel, BorderLayout.CENTER);
         panel.add(keyGenSection);
 
-        // Add key listener to lambda field to auto-set parameters
-        lambdaField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (!lambdaField.getText().isEmpty()) {
-                    generateParametersFromLambda();
-                }
-            }
+        toggleParameterInput(false);
+
+        return panel;
+    }
+
+    private JPanel createEncryptPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JPanel encryptionSection = new JPanel(new BorderLayout());
+        encryptionSection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Encrypt"));
+
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton inputManualRadio = new JRadioButton("Input data manually");
+        JRadioButton loadCsvRadio = new JRadioButton("Load from CSV file");
+        ButtonGroup inputGroup = new ButtonGroup();
+        inputGroup.add(inputManualRadio);
+        inputGroup.add(loadCsvRadio);
+        inputPanel.add(inputManualRadio);
+        inputPanel.add(loadCsvRadio);
+        encryptionSection.add(inputPanel, BorderLayout.NORTH);
+
+        customInputLabel = new JLabel("Custom Input:");
+        customInputField = new JTextField(20);
+        customInputLabel.setVisible(false);
+        customInputField.setVisible(false);
+        inputPanel.add(customInputLabel);
+        inputPanel.add(customInputField);
+
+        inputManualRadio.addActionListener(e -> {
+            customInputLabel.setVisible(true);
+            customInputField.setVisible(true);
+        });
+        loadCsvRadio.addActionListener(e -> {
+            customInputLabel.setVisible(false);
+            customInputField.setVisible(false);
+            loadCSVFile();
         });
 
-        // Initial state
-        toggleParameterInput(false, true);
+        encryptionSection.add(inputPanel, BorderLayout.CENTER);
 
-        return panel;
-    }
-
-    private JPanel createStep2Panel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.add(new JLabel("Custom Input:"));
-        customInputField = new JTextField(20);
-        panel.add(customInputField);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton encryptButton = new JButton("Encrypt");
         encryptButton.addActionListener(e -> encryptPlaintext());
-        panel.add(encryptButton);
-        JButton loadCsvButton = new JButton("Load CSV");
-        loadCsvButton.addActionListener(e -> loadCSVFile());
-        panel.add(loadCsvButton);
-        return panel;
-    }
+        buttonPanel.add(encryptButton);
+        saveButton = new JButton("Save to File");
+        saveButton.addActionListener(e -> saveCiphertextToFile());
+        buttonPanel.add(saveButton);
 
-    private JPanel createStep3Panel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton addButton = new JButton("Add");
-        addButton.addActionListener(e -> performHomomorphicAddition());
-        panel.add(addButton);
-        JButton multiplyButton = new JButton("Multiply");
-        multiplyButton.addActionListener(e -> performHomomorphicMultiplication());
-        panel.add(multiplyButton);
-        return panel;
-    }
-
-    private JPanel createStep4Panel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton decryptButton = new JButton("Decrypt");
-        decryptButton.addActionListener(e -> decryptCiphertext());
-        panel.add(decryptButton);
-        return panel;
-    }
-
-    private JPanel createStep5Panel() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        outputArea = new JTextArea(20, 50);
-        outputArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(outputArea);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        encryptionSection.add(buttonPanel, BorderLayout.SOUTH);
+        panel.add(encryptionSection);
 
         return panel;
     }
 
-    private void toggleParameterInput(boolean show, boolean init) {
-        parameterInputPanel.setVisible(show);
-        saveKeysButton.setVisible(show);
-        polyModulusDegreeField.setEditable(show);
-        plaintextModulusField.setEditable(show);
-        ciphertextModulusField.setEditable(show);
-        if (!show && !init) {
-            loadKeysFromFile();
+    private void toggleParameterInput(boolean show) {
+        for (Component component : parameterInputPanel.getComponents()) {
+            component.setVisible(show);
         }
     }
 
     private void generateParametersFromLambda() {
         try {
             int lambda = Integer.parseInt(lambdaField.getText());
-            int polynomialDegree = (int) Math.pow(2, lambda / 8);
-            BigInteger plaintextModulus = new BigInteger("257");
-            BigInteger ciphertextModulus = new BigInteger("99999999999999999991");
-            parameters = new Parameters(polynomialDegree, plaintextModulus, ciphertextModulus);
-            encoder = new BatchEncoder(parameters);
+            int polynomialDegree = 1 << (lambda - 1);
+            BigInteger base = BigInteger.valueOf(2L * polynomialDegree);
+            BigInteger plaintextModulus = base.add(BigInteger.ONE);
+            while (!plaintextModulus.isProbablePrime(100)) {
+                plaintextModulus = plaintextModulus.add(base);
+            }
+            lastPlaintextModulus = plaintextModulus;
+
+            BigInteger ciphertextModulus = (plaintextModulus.compareTo(BigInteger.valueOf(10000)) > 0) ?
+                    new BigInteger("9999999991") :
+                    new BigInteger("799999999");
+
             outputArea.append("Parameters generated with lambda: " + lambda + "\n");
             polyModulusDegreeField.setText(String.valueOf(polynomialDegree));
             plaintextModulusField.setText(plaintextModulus.toString());
@@ -246,6 +233,27 @@ class UseCasesPanel extends JPanel {
         } catch (NumberFormatException e) {
             outputArea.append("Invalid lambda value.\n");
         }
+    }
+
+    private void generateNextPlaintextModulus() {
+        if (lastPlaintextModulus == null) {
+            outputArea.append("Generate initial parameters first.\n");
+            return;
+        }
+        int polynomialDegree = Integer.parseInt(polyModulusDegreeField.getText());
+        BigInteger base = BigInteger.valueOf(2 * polynomialDegree);
+        BigInteger nextPlaintextModulus = lastPlaintextModulus.add(base);
+        while (!nextPlaintextModulus.isProbablePrime(100)) {
+            nextPlaintextModulus = nextPlaintextModulus.add(base);
+        }
+        lastPlaintextModulus = nextPlaintextModulus;
+        plaintextModulusField.setText(nextPlaintextModulus.toString());
+        outputArea.append("Next plaintext modulus generated: " + nextPlaintextModulus.toString() + "\n");
+
+        BigInteger ciphertextModulus = (nextPlaintextModulus.compareTo(BigInteger.valueOf(10000)) > 0) ?
+                new BigInteger("9999999991") :
+                new BigInteger("799999999");
+        ciphertextModulusField.setText(ciphertextModulus.toString());
     }
 
     private void setParametersManually() {
@@ -267,8 +275,11 @@ class UseCasesPanel extends JPanel {
 
     private void generateKeys() {
         if (parameters == null) {
-            outputArea.append("Set parameters first.\n");
-            return;
+            int polynomialDegree = Integer.parseInt(polyModulusDegreeField.getText());
+            BigInteger plaintextModulus = new BigInteger(plaintextModulusField.getText());
+            BigInteger ciphertextModulus = new BigInteger(ciphertextModulusField.getText());
+            parameters = new Parameters(polynomialDegree, plaintextModulus, ciphertextModulus);
+            encoder = new BatchEncoder(parameters);
         }
         KeyGenerator generator = new KeyGenerator(parameters);
         publicKey = generator.getPublicKey();
@@ -291,18 +302,24 @@ class UseCasesPanel extends JPanel {
             File fileToSave = fileChooser.getSelectedFile();
             try {
                 Files.createDirectories(fileToSave.toPath());
-                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(fileToSave, "publicKey.key")))) {
-                    oos.writeObject(publicKey);
-                }
+
+                // Save the secret key and parameters in one file
                 try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(fileToSave, "secretKey.key")))) {
                     oos.writeObject(secretKey);
+                    oos.writeObject(parameters);
                 }
-                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(fileToSave, "relinearizationKeys.key")))) {
+
+                // Save the public key and relinearization keys in a different file
+                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(fileToSave, "publicKeysParams.key")))) {
+                    oos.writeObject(publicKey);
                     oos.writeObject(relinearizationKeys);
+                    oos.writeObject(parameters);
                 }
+
                 outputArea.append("Keys saved to folder: " + fileToSave.getAbsolutePath() + "\n");
             } catch (IOException e) {
                 outputArea.append("Error saving keys to folder: " + e.getMessage() + "\n");
+                e.printStackTrace();
             }
         }
     }
@@ -313,10 +330,10 @@ class UseCasesPanel extends JPanel {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToLoad = fileChooser.getSelectedFile();
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileToLoad))) {
+                parameters = (Parameters) ois.readObject();
                 publicKey = (PublicKey) ois.readObject();
-                secretKey = (SecretKey) ois.readObject();
                 relinearizationKeys = (RelinearizationKeys) ois.readObject();
-                parameters = (Parameters) ois.readObject(); // Assuming parameters are stored within keys
+                secretKey = (SecretKey) ois.readObject();
                 encoder = new BatchEncoder(parameters);
                 encryptor = new Encryptor(parameters, publicKey);
                 decryptor = new Decryptor(parameters, secretKey);
@@ -324,6 +341,7 @@ class UseCasesPanel extends JPanel {
                 outputArea.append("Keys loaded from file: " + fileToLoad.getAbsolutePath() + "\n");
             } catch (IOException | ClassNotFoundException e) {
                 outputArea.append("Error loading keys from file: " + e.getMessage() + "\n");
+                e.printStackTrace();
             }
         }
     }
@@ -341,6 +359,7 @@ class UseCasesPanel extends JPanel {
                 outputArea.append("Data loaded from CSV file: " + csvFile.getAbsolutePath() + "\n");
             } catch (IOException e) {
                 outputArea.append("Error loading CSV file: " + e.getMessage() + "\n");
+                e.printStackTrace();
             }
         }
     }
@@ -360,87 +379,26 @@ class UseCasesPanel extends JPanel {
             outputArea.append("Encrypted: " + plaintext + "\n");
         } catch (Exception e) {
             outputArea.append("Encryption failed: " + e.getMessage() + "\n");
+            e.printStackTrace();
         }
     }
 
-    private void decryptCiphertext() {
+    private void saveCiphertextToFile() {
         if (lastCiphertext == null) {
-            outputArea.append("No ciphertext to decrypt.\n");
+            outputArea.append("No ciphertext to save.\n");
             return;
         }
-        try {
-            Plaintext decrypted = decryptor.decrypt(lastCiphertext, null);
-            BigInteger[] coefficients = encoder.decode(decrypted);
-            String decryptedText = Arrays.toString(coefficients);
-            outputArea.append("Decrypted: " + decryptedText + "\n");
-        } catch (Exception e) {
-            outputArea.append("Decryption failed: " + e.getMessage() + "\n");
+        fileChooser.setDialogTitle("Save Ciphertext");
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileToSave))) {
+                oos.writeObject(lastCiphertext);
+                outputArea.append("Ciphertext saved to file: " + fileToSave.getAbsolutePath() + "\n");
+            } catch (IOException e) {
+                outputArea.append("Error saving ciphertext to file: " + e.getMessage() + "\n");
+                e.printStackTrace();
+            }
         }
-    }
-
-    private void performHomomorphicAddition() {
-        if (lastCiphertext == null) {
-            outputArea.append("No ciphertext to add.\n");
-            return;
-        }
-        try {
-            String secondPlaintext = JOptionPane.showInputDialog(this, "Enter second plaintext for addition (comma-separated integers):");
-            BigInteger[] coefficients = Arrays.stream(secondPlaintext.split(","))
-                    .map(BigInteger::new)
-                    .toArray(BigInteger[]::new);
-            Plaintext secondPlain = encoder.encode(coefficients);
-            Ciphertext secondCiphertext = encryptor.encrypt(secondPlain);
-
-            lastCiphertext = evaluator.add(lastCiphertext, secondCiphertext);
-            outputArea.append("Performed homomorphic addition.\n");
-        } catch (Exception e) {
-            outputArea.append("Addition failed: " + e.getMessage() + "\n");
-        }
-    }
-
-    private void performHomomorphicMultiplication() {
-        if (lastCiphertext == null) {
-            outputArea.append("No ciphertext to multiply.\n");
-            return;
-        }
-        try {
-            String secondPlaintext = JOptionPane.showInputDialog(this, "Enter second plaintext for multiplication (comma-separated integers):");
-            BigInteger[] coefficients = Arrays.stream(secondPlaintext.split(","))
-                    .map(BigInteger::new)
-                    .toArray(BigInteger[]::new);
-            Plaintext secondPlain = encoder.encode(coefficients);
-            Ciphertext secondCiphertext = encryptor.encrypt(secondPlain);
-
-            lastCiphertext = evaluator.multiply(lastCiphertext, secondCiphertext, relinearizationKeys);
-            outputArea.append("Performed homomorphic multiplication.\n");
-        } catch (Exception e) {
-            outputArea.append("Multiplication failed: " + e.getMessage() + "\n");
-        }
-    }
-
-    private void showNextStep() {
-        if (currentStep < 4) {
-            currentStep++;
-            cardLayout.show(cardPanel, "Step" + (currentStep + 1));
-            updateNavigationButtons();
-        }
-    }
-
-    private void showPreviousStep() {
-        if (currentStep > 0) {
-            currentStep--;
-            cardLayout.show(cardPanel, "Step" + (currentStep + 1));
-            updateNavigationButtons();
-        }
-    }
-
-    private void finishWizard() {
-        JOptionPane.showMessageDialog(this, "Wizard completed!");
-    }
-
-    private void updateNavigationButtons() {
-        previousButton.setEnabled(currentStep > 0);
-        nextButton.setEnabled(currentStep < 4);
-        finishButton.setEnabled(currentStep == 4);
     }
 }

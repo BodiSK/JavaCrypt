@@ -1,6 +1,7 @@
 package utils.structures;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -10,7 +11,7 @@ import java.math.BigInteger;
  *      a single polynomial representing a plaintext from Zt[X]/(X^d+1)
  *      and modulus t
  */
-public class Plaintext {
+public class Plaintext implements Serializable {
 
     private Polynomial polynomial;
     private BigInteger modulus;

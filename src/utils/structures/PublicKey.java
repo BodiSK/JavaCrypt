@@ -1,13 +1,15 @@
 package utils.structures;
 
 
+import java.io.Serializable;
+
 /**
  * A wrapper class for a Public Key instance.
  * An instance of the class is needed whenever there is an operation that needs to be performed on the ciphertext.
  * Holds:
  *      a tuple of polynomials corresponding to the two parts of the public key
  */
-public class PublicKey {
+public class PublicKey implements Serializable {
 
     private Polynomial pk0;
     private Polynomial pk1;

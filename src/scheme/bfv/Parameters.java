@@ -1,6 +1,7 @@
 package scheme.bfv;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -9,7 +10,7 @@ import java.math.RoundingMode;
 /**
  * A class that holds the necessary parameters for initializing a BFV homomorphic scheme
  */
-public class Parameters {
+public class Parameters implements Serializable {
 
     private int polynomialDegree;
     private BigInteger plaintextModulus;

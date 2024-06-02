@@ -2,6 +2,8 @@ package utils.structures;
 
 import org.apache.commons.math3.complex.Complex;
 import utils.Utilities;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -27,7 +29,7 @@ import static utils.Constants.*;
  *              array of BigInteger values representing the coefficients of the polynomial
  *              integer value representing the polynomial degree
 */
-public class Polynomial {
+public class Polynomial implements Serializable {
 
     private BigInteger[] coefficients;
     private int polynomialDegree;

@@ -1,6 +1,7 @@
 package GUI;
 
 import GUI.test.tab.TestCasesPanel;
+import GUI.use.tab.UseCasesPanel;
 
 import javax.swing.*;
 

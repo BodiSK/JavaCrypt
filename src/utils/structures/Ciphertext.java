@@ -1,5 +1,6 @@
 package utils.structures;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -9,7 +10,7 @@ import java.math.BigInteger;
  *      scaling factor which is the ratio between ciphertext space modulus and plaintext space modulus,
  *      and modulus q
  */
-public class Ciphertext {
+public class Ciphertext implements Serializable {
 
     private Polynomial encryptionPolynomial; // c0
     private Polynomial additionalComponent; //c1

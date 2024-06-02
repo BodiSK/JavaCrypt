@@ -40,9 +40,7 @@ public class ParametersAccuracyTestCaseDemo {
         }
 
         Plaintext decrypted = decryptor.decrypt(result, null);
-        BigInteger[] actual = encoder != null
-                ? encoder.decode(decrypted)
-                : decrypted.getPolynomial().getCoefficients();
+        BigInteger[] actual = encoder.decode(decrypted);
 
         BigInteger[] expected = new BigInteger[polynomialDegree];
 
