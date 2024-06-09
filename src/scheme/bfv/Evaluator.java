@@ -29,8 +29,11 @@ public class Evaluator {
      * Performs homomomorphic addition on two ciphertexts by adding each of the corresponding part of the ciphertext polynomial tuple.
      */
     public Ciphertext add(Ciphertext first, Ciphertext second) {
-        Polynomial additionFirstPart = first.getEncryptionPolynomial().add(second.getEncryptionPolynomial(), this.cipherTextModulus);
-        Polynomial additionSecondPart = first.getAdditionalComponent().add(second.getAdditionalComponent(), this.cipherTextModulus);
+        Polynomial additionFirstPart = first.getEncryptionPolynomial()
+                .add(second.getEncryptionPolynomial(), this.cipherTextModulus);
+
+        Polynomial additionSecondPart = first.getAdditionalComponent()
+                .add(second.getAdditionalComponent(), this.cipherTextModulus);
 
         return  new Ciphertext(additionFirstPart, additionSecondPart, this.scalingFactor.toBigInteger(), this.cipherTextModulus);
     }
@@ -65,11 +68,11 @@ public class Evaluator {
      * coefficient base decomposition.
      */
     public Ciphertext multiply(Ciphertext first, Ciphertext second, RelinearizationKeys relinearizationKeys) {
-        Polynomial c01 = first.getEncryptionPolynomial();//ciph1.c0
-        Polynomial c02 = second.getEncryptionPolynomial();//ciph2.c0
+        Polynomial c01 = first.getEncryptionPolynomial();
+        Polynomial c02 = second.getEncryptionPolynomial();
 
-        Polynomial c11 = first.getAdditionalComponent();//ciph1.c1
-        Polynomial c12 = second.getAdditionalComponent();//ciph2.c1
+        Polynomial c11 = first.getAdditionalComponent();
+        Polynomial c12 = second.getAdditionalComponent();
 
         Polynomial c0 = c01.multiplyFFT(c02)
                 .divideByNonIntegerScalar(scalingFactor, null)

@@ -4,6 +4,8 @@ import org.apache.commons.math3.complex.Complex;
 
 import java.math.BigInteger;
 
+import static utils.Constants.INVALID_VECTOR_LENGTH_EXCEPTION;
+
 /**
  * A class encapsulating functionality for performing operations with bits
  */
@@ -22,7 +24,6 @@ public class BitOperations {
      * bit representation of a power of 2 has exactly 1 non zero element at the position of the power
      * subtracting one of it is since the starting power is 0
      */
-    //todo think for removing to another class to encapsulate specific functionality
     public static int logarithmBaseTwoOfBigInteger(BigInteger value) {
         return value.bitLength()-1;
     }
@@ -36,7 +37,6 @@ public class BitOperations {
      * @param value the value to be reversed
      * @param bitLength the length of bits the result should have
      */
-    //todo provide more documentation here and check if it is not more optimal to use integer instead
     public static BigInteger bitReversal(BigInteger value, int bitLength) {
         BigInteger reversedValue = BigInteger.ZERO;
         for (int i = 0; i < bitLength; i++) {
@@ -65,8 +65,8 @@ public class BitOperations {
         BigInteger [] result = new BigInteger[length];
 
         if(!isPowerOfTwo(BigInteger.valueOf(length))) {
-            throw new IllegalArgumentException(String.format("Invalid length of input vector %d! " +
-                    "Length of vector to be reversed must be a power of two", length));
+            throw new IllegalArgumentException(String.format(INVALID_VECTOR_LENGTH_EXCEPTION
+                    , length));
         }
 
         for (int i = 0; i < length; i++) {
@@ -77,15 +77,14 @@ public class BitOperations {
         return result;
     }
 
-    //todo check if this and the above method could be made into a template method
     public static Complex[] vectorBitReversalComplex(Complex[] values) {
         int length = values.length;
 
         Complex [] result = new Complex[length];
 
         if(!isPowerOfTwo(BigInteger.valueOf(length))) {
-            throw new IllegalArgumentException(String.format("Invalid length of input vector %d! " +
-                    "Length of vector to be reversed must be a power of two", length));
+            throw new IllegalArgumentException(String.format(INVALID_VECTOR_LENGTH_EXCEPTION
+                    , length));
         }
 
         for (int i = 0; i < length; i++) {

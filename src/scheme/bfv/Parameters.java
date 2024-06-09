@@ -4,11 +4,11 @@ package scheme.bfv;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 
 /**
  * A class that holds the necessary parameters for initializing a BFV homomorphic scheme
+ * Holds polynomial degree d, plaintext modulus - t, ciphertext modulus and the ration between ciphertext plaintext moduli - delta.
  */
 public class Parameters implements Serializable {
 

@@ -47,7 +47,7 @@ public class KeyGenerator {
      * The public key consists of a polynomial tuple, the first part is the masked secret and the second is a random polynomial.
      */
     private void generatePublicKey(Parameters parameters) {
-        //also known as a
+        //polynomial a from the original equation
         BigInteger[] randomCoefficients = SamplingOperations
                 .normalSampling(BigInteger.ZERO, parameters.getCiphertextModulus(), parameters.getPolynomialDegree());
 
@@ -67,16 +67,15 @@ public class KeyGenerator {
         this.publicKey = new PublicKey(keyFirstPart, randomPolynomial);
     }
 
-    //todo - check notes row 12 downward to find an optimal solution for performing og ith less precision loss
+    /**
+     * Generates an instance of the relinearization keys list, using the base decomposition technique.
+     */
     private void generateRelinerizationKeysWithBaseDecompositionTechnique(Parameters parameters) {
         BigInteger ciphertextMod = parameters.getCiphertextModulus();
 
-        //todo use the guava library to perform the operation must check if the squaring and logarithm operations
-        // could be performed safely on BigInteger and have as result integer without that resulting in a precision loss
         BigInteger base = RoundingOperations
                 .roundSquareRootToCeil(ciphertextMod, parameters.getCiphertextModulus().sqrt());
 
-        //todo - check the original operation - that takes the floor of log and adds one
         int levels = RoundingOperations.getRoundedLogarithmOfArbitraryBaseToFloor(ciphertextMod, base).intValue();
 
         BigInteger[] keys = new BigInteger[levels];
@@ -95,7 +94,6 @@ public class KeyGenerator {
 
             Polynomial error = new Polynomial(parameters.getPolynomialDegree(), randomErrorCoefficients);
 
-            //todo - there might be an error due to scalar multiply operation implementation - must check
             Polynomial k0 = this.secretKey.getSecret()
                     .multiply(k1, ciphertextMod)
                     .add(error, ciphertextMod)

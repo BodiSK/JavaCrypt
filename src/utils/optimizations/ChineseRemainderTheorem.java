@@ -21,11 +21,8 @@ public class ChineseRemainderTheorem {
 
     public ChineseRemainderTheorem(BigInteger polynomialDegree, int bitSize, int numberOfPrimes) {
         this.polynomialDegree = polynomialDegree;
-
-        //todo refactoring - method for finding prime number of specified length must be part of the AlgebraicOperationsClass
-        // make a comparison with built in method and miller-rabin iterative test - why the first fails??
         //computePrimes(bitSize, numberOfPrimes);
-        this.primeNumbers = generatePrimes(numberOfPrimes,bitSize, polynomialDegree, 200);
+        this.primeNumbers = generatePrimes(numberOfPrimes,bitSize, polynomialDegree);
         computeTransforms();
         computePrimesProduct();
 
@@ -35,7 +32,7 @@ public class ChineseRemainderTheorem {
     /**
      * Generates a list of prime numbers with specified bitLength
      * all of them must be congruent modulo M, where M is two times the polynomialDegree
-     * use Java.maths BigInteger class embedded method for better performance
+     * uses Java.maths BigInteger class embedded method for better performance
      */
     private void computePrimes(int bitSize, int numberOfPrimes) {
 
@@ -79,6 +76,64 @@ public class ChineseRemainderTheorem {
             precomputedDivisionResults[i] = primesProduct.divide(primeNumbers[i]);
             precomputedDivisionResultsInverse[i] = AlgebraicOperations.modInverseWithPrimeModulus(precomputedDivisionResults[i], primeNumbers[i]);
         }
+    }
+
+    /**
+     * Returns true if posPrime passes the Miller-Rabin primality test
+     *
+     * @param posPrime the candidate number to test for primality
+     * @param tests    number of iterations
+     * @return true if posPrime is probably prime
+     */
+    private boolean millerRabinTest(BigInteger posPrime, int tests) {
+        if (posPrime.equals(BigInteger.TWO)) {
+            return true;
+        }
+        if (posPrime.mod(BigInteger.TWO).equals(BigInteger.ZERO)) {
+            return false;
+        }
+
+        int s = 0;
+        BigInteger d = posPrime.subtract(BigInteger.ONE);
+        while (d.mod(BigInteger.TWO).equals(BigInteger.ZERO)) {
+            s++;
+            d = d.divide(BigInteger.TWO);
+        }
+
+        for (int i = 0; i < tests; i++) {
+            BigInteger a = randomBigIntegerMoreThanTwoLessThanPosPrime(posPrime);
+            BigInteger x = a.modPow(d, posPrime);
+            if (x.equals(BigInteger.ONE) || x.equals(posPrime.subtract(BigInteger.ONE))) {
+                continue;
+            }
+
+            int r = 0;
+            for (; r < s; r++) {
+                x = x.modPow(BigInteger.TWO, posPrime);
+                if (x.equals(BigInteger.ONE)) {
+                    return false;
+                }
+                if (x.equals(posPrime.subtract(BigInteger.ONE))) {
+                    break;
+                }
+            }
+            if (r == s) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private BigInteger randomBigIntegerMoreThanTwoLessThanPosPrime(BigInteger posPrime) {
+        BigInteger minLimit = BigInteger.TWO;
+        BigInteger maxLimit = posPrime.subtract(minLimit);
+        BigInteger randomBigInt;
+
+        do {
+            randomBigInt = new BigInteger(posPrime.bitLength(), randomGenerator);
+        } while (randomBigInt.compareTo(minLimit) < 0 || randomBigInt.compareTo(maxLimit) >= 0);
+
+        return randomBigInt;
     }
 
     public BigInteger[] deconstruct(BigInteger value) {
@@ -130,77 +185,20 @@ public class ChineseRemainderTheorem {
     }
 
 
-
-
-    private BigInteger[] generatePrimes(int totPrimes, int primeBitSize, BigInteger polynomialDegree, int millerRabinIterations){
+    public BigInteger[] generatePrimes(int totPrimes, int primeBitSize, BigInteger polynomialDegree) {
         BigInteger mod = BigInteger.TWO.multiply(polynomialDegree);
         BigInteger[] primes = new BigInteger[totPrimes];
-        BigInteger posPrime;
+        BigInteger posPrime = BigInteger.TWO.pow(primeBitSize).add(BigInteger.ONE);
 
-        // This is the smallest possible prime that has more bits that primeBitSize
-        posPrime = BigInteger.TWO.pow(primeBitSize).add(BigInteger.ONE);
-
-        for (int i = 0; i < totPrimes;){
-            if (millerRabinTest(posPrime, millerRabinIterations)){
+        for (int i = 0; i < totPrimes;) {
+            if (millerRabinTest(posPrime, 200)) {
                 primes[i] = posPrime;
                 i++;
             }
-
             posPrime = posPrime.add(mod);
         }
 
         return primes;
     }
 
-    /**
-     * Return true if it passes the miller rabin test
-     * @param posPrime
-     * @param tests
-     * @return
-     */
-    private boolean millerRabinTest(BigInteger posPrime, int tests) {
-        if (posPrime.equals(BigInteger.TWO)){
-            return true;
-        }
-        if (posPrime.mod(BigInteger.TWO).intValue() == 2){
-            return false;
-        }
-
-        int s = 0;
-        BigInteger d = posPrime.subtract(BigInteger.ONE);
-        while (d.mod(BigInteger.TWO).equals(BigInteger.ZERO)) {
-            s++;
-            d = d.divide(BigInteger.TWO);
-        }
-        for (int i = 0; i < tests; i++) {
-            //BigInteger a = randomBigIntegerMoreThanTwo(posPrime.subtract(oneBigInt));
-            BigInteger a = randomBigIntegerMoreThanTwoLessThanPosPrime(posPrime);
-            BigInteger x = a.modPow(d, posPrime);
-            if (x.equals(BigInteger.ONE) || x.equals(posPrime.subtract(BigInteger.ONE)))
-                continue;
-            int r = 0;
-            for (; r < s; r++) {
-                x = x.modPow(BigInteger.TWO, posPrime);
-                if (x.equals(BigInteger.ONE))
-                    return false;
-                if (x.equals(posPrime.subtract(BigInteger.ONE)))
-                    break;
-            }
-            if (r == s)
-                return false;
-        }
-        return true;
-    }
-
-    private BigInteger randomBigIntegerMoreThanTwoLessThanPosPrime(BigInteger posPrime){
-        BigInteger minLimit = new BigInteger("2");
-        BigInteger bigInteger = posPrime.subtract(minLimit);
-        int len = posPrime.bitLength();
-        BigInteger res = new BigInteger(len, randomGenerator);
-        if (res.compareTo(minLimit) < 0)
-            res = res.add(minLimit);
-        if (res.compareTo(bigInteger) >= 0)
-            res = res.mod(bigInteger).add(minLimit);
-        return res;
-    }
 }

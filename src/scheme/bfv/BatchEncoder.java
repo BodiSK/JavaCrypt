@@ -8,6 +8,8 @@ import utils.structures.Polynomial;
 
 import java.math.BigInteger;
 
+import static scheme.Constants.BATCH_ENCODER_INCORRECT_NUMBER_OF_VALUES_EXCEPTION;
+
 /**
  * A class encapsulating the logic for encoding an integer into Plaintext .
  * A Polynomial from the ring Z[X]/(X^d+1) maps to a d-length vector which arguments are the polynomial evaluated
@@ -38,8 +40,7 @@ public class BatchEncoder {
     public Plaintext encode(BigInteger[] toEncode) {
 
         if(toEncode.length != this.polynomialDegree) {
-            throw  new IllegalArgumentException("In order to perform encoding correctly the values to be encoded must be as many" +
-                    "as the degree of the of the ring in which they are to be transformed!");
+            throw  new IllegalArgumentException(BATCH_ENCODER_INCORRECT_NUMBER_OF_VALUES_EXCEPTION);
         }
 
         BigInteger[] transformedValues = this.numberTheoreticTransform.inverseTransform(toEncode);

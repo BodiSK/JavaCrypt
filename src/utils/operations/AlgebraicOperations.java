@@ -7,6 +7,8 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Optional;
 
+import static utils.Constants.*;
+
 
 /**
  * A class encapsulating functionality for basic number theory functions
@@ -38,15 +40,14 @@ public class AlgebraicOperations {
     public static BigInteger modInverseWithPrimeModulus(BigInteger value, BigInteger modulus) {
 
         if (!testPrime(modulus)) {
-            throw new IllegalArgumentException(String.format("Incorrect value %d for modulus provided. Modulus should be prime number",
+            throw new IllegalArgumentException(String.format(INCORRECT_VALUE_FOR_MODULUS_PROVIDED_EXCEPTION,
                     modulus.intValue()));
         }
         return value.modInverse(modulus);
     }
 
 
-    //TODO compare methods accuracy with miller-rabin or solovay-strassen  must have different variants for space of comparison
-    // the Apache commons has an implementation of Pollard Rho
+
     public static boolean testPrime(BigInteger value) {
         return value.isProbablePrime(CERTAINTY);
     }
@@ -60,7 +61,6 @@ public class AlgebraicOperations {
      * equals Euler's totient function, which for prime q equals q-1
      * Source: https://www.geeksforgeeks.org/primitive-root-of-a-prime-number-n-modulo-n/
      *         https://en.wikipedia.org/wiki/Primitive_root_modulo_n for theoretical explanation
-     *         todo: make a readme file with the source links for better readability
      *
      * @param modulus modulus with respect to which operations are performed
      * @throws IllegalArgumentException if modulus is not prime
@@ -68,7 +68,8 @@ public class AlgebraicOperations {
      */
     public static Optional<BigInteger> findGeneratorOfPrimeModulus(BigInteger modulus) {
         if (!testPrime(modulus)) {
-            throw new IllegalArgumentException(String.format("Incorrect value %d for modulus provided. Modulus should be prime number", modulus.intValue()));
+            throw new IllegalArgumentException(String.format(INCORRECT_VALUE_FOR_MODULUS_PROVIDED_EXCEPTION,
+                    modulus.intValue()));
         }
 
         BigInteger eulerTotientFunction = modulus.subtract(BigInteger.ONE);
@@ -101,7 +102,6 @@ public class AlgebraicOperations {
      *
      * @param value number to factorize
      * @return  factors set of values representing the number's factors
-     * TODO: check if using Pollard rho's algorithm is more efficient
      */
     public static HashSet<BigInteger> findPrimeFactors( BigInteger value) {
         HashSet<BigInteger> factors = new HashSet<>();
@@ -144,23 +144,23 @@ public class AlgebraicOperations {
      */
     public static BigInteger findRootOfUnity(BigInteger order, BigInteger modulus) {
         if (!testPrime(modulus)) {
-            throw new IllegalArgumentException(String.format("Incorrect value %d for modulus provided." +
-                    " Modulus should be prime number", modulus.intValue()));
+            throw new IllegalArgumentException(String.format(INCORRECT_VALUE_FOR_MODULUS_PROVIDED_EXCEPTION
+                    , modulus.intValue()));
         }
 
         if(!modulus.subtract(BigInteger.ONE).mod(order).equals(BigInteger.ZERO)) {
-            throw new IllegalArgumentException(String.format("Incorrect value %d for order provided." +
-                    " Order should divide modulus - 1  = %d", order.intValue(), modulus.subtract(BigInteger.ONE).intValue()));
+            throw new IllegalArgumentException(String.format(INCORRECT_VALUE_FOR_ORDER_PROVIDED
+                    , order.intValue(), modulus.subtract(BigInteger.ONE).intValue()));
         }
 
         Optional<BigInteger> generator = findGeneratorOfPrimeModulus(modulus);
 
         if(generator.isEmpty()) {
-            throw new UnsupportedOperationException(String.format("No primitive root of unity mod m = %d", modulus.intValue()));
+            throw new UnsupportedOperationException(String.format(NO_PRIMITIVE_ROOT_OF_UNITY_FOUND_EXCEPTION,
+                    modulus.intValue()));
         }
 
         BigInteger modulusMinusOne = modulus.subtract(BigInteger.ONE);
-        // TODO - created problem for crtPolynomial multiplication - loss of precision - find universal solution
         //BigInteger power = performBigIntegerDivisionHalfDown(modulusMinusOne, order);
         BigInteger power = modulusMinusOne.divide(order);
 
@@ -173,8 +173,6 @@ public class AlgebraicOperations {
         return result;
     }
 
-    //todo make method more general, when working with big values the explicit turn into integer type before wrapping into BigInteger
-    // causes loss of precision, implement a general mechanism or add a condition when to use the method so the calculations would be correct
     public static BigInteger performBigIntegerDivisionHalfDown(BigInteger dividend, BigInteger divisor) {
         BigDecimal dividendToDecimal = new BigDecimal(dividend);
         BigDecimal divisorToDecimal = new BigDecimal(divisor);
@@ -185,20 +183,4 @@ public class AlgebraicOperations {
     public static BigInteger takeRemainder(BigInteger dividend, BigInteger divisor) {
         return dividend.mod(divisor);
     }
-
-    //TODO find a more optimal way of halving down the division of two BigIntegers
-//    public static BigInteger performBigIntegerDivisionHalfDownWithoutPrecisionLoss(BigInteger dividend, BigInteger divisor) {
-//        BigInteger[] result = dividend.divideAndRemainder(divisor);
-//        BigInteger quotient = result[0];
-//
-//        // Check if the remainder requires rounding
-////        if (result[1].multiply(BigInteger.valueOf(2)).compareTo(divisor) >= 0) {
-////            quotient = quotient.subtract(BigInteger.ONE);
-////        }
-//
-//        return quotient;
-//    }
-
-    //TODO go through code and ensure there is consistency in naming of variables and in comments the formulae used
-    // are the same as the mathematical expressions in the theoretical part
 }

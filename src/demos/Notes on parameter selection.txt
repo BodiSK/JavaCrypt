@@ -3,6 +3,8 @@ degree = 8;
 plaintext = 257
 ciphertext = 799 999 999
 
+//257, 337, 353, 401, 433, 449, 577, 593, 641, 673, 881,
+
 multiplication, addition, multiplication
 
 

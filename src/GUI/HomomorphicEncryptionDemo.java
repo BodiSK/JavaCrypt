@@ -20,14 +20,8 @@ public class HomomorphicEncryptionDemo extends JFrame {
         tabbedPane.addTab("Test Cases", new TestCasesPanel());
         tabbedPane.setToolTipTextAt(0, "Run various test cases to evaluate encryption parameters");
 
-        tabbedPane.addTab("Basic Operations", new BasicOperationsPanel());
-        tabbedPane.setToolTipTextAt(1, "Perform basic encryption and decryption operations");
-
-        tabbedPane.addTab("Parameter Selection", new ParameterSelectionPanel());
-        tabbedPane.setToolTipTextAt(2, "Select and apply encryption parameters");
-
         tabbedPane.addTab("Use Cases", new UseCasesPanel());
-        tabbedPane.setToolTipTextAt(3, "Define and run custom use cases");
+        tabbedPane.setToolTipTextAt(1, "Define and run custom use cases");
 
         add(tabbedPane);
 

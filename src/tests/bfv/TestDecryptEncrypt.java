@@ -1,5 +1,7 @@
 package tests.bfv;
 
+import org.junit.Before;
+import org.junit.Test;
 import scheme.bfv.*;
 import utils.structures.Ciphertext;
 import utils.structures.Plaintext;
@@ -7,31 +9,42 @@ import utils.structures.PublicKey;
 import utils.structures.SecretKey;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
 
 public class TestDecryptEncrypt {
-    public static void main(String[] args) {
-        int polynomialDegree = 8;
-        BigInteger plaintextModulus = new BigInteger("257");
-        BigInteger ciphertextModulus = new BigInteger("65537");
 
-        Parameters parameters = new Parameters(polynomialDegree, plaintextModulus, ciphertextModulus);
+    private int polynomialDegree;
+    private BigInteger plaintextModulus;
+    private BigInteger ciphertextModulus;
+    private Parameters parameters;
+    private KeyGenerator generator;
+    private PublicKey pk;
+    private SecretKey sk;
+    private BatchEncoder encoder;
+    private Encryptor encryptor;
+    private Decryptor decryptor;
 
-        KeyGenerator generator = new KeyGenerator(parameters);
+    @Before
+    public void setUp() {
+        polynomialDegree = 8;
+        plaintextModulus = new BigInteger("257");
+        ciphertextModulus = new BigInteger("65537");
 
-        PublicKey pk = generator.getPublicKey();
-        SecretKey sk = generator.getSecretKey();
-        RelinearizationKeys rk = generator.getRelinearizationKeys();
+        parameters = new Parameters(polynomialDegree, plaintextModulus, ciphertextModulus);
 
-        BatchEncoder encoder = new BatchEncoder(parameters);
-        Encryptor encryptor = new Encryptor(parameters, pk);
-        Decryptor decryptor = new Decryptor(parameters, sk);
-        Evaluator evaluator = new Evaluator(parameters);
+        generator = new KeyGenerator(parameters);
 
-        // message1 = [0, 5, 8, 2, 5, 16, 4, 5]
-        //    message2 = [1, 2, 3, 4, 5, 6, 7, 8]
+        pk = generator.getPublicKey();
+        sk = generator.getSecretKey();
 
+        encoder = new BatchEncoder(parameters);
+        encryptor = new Encryptor(parameters, pk);
+        decryptor = new Decryptor(parameters, sk);
+    }
+
+    @Test
+    public void testEncryptDecrypt() {
         BigInteger[] message1 = {BigInteger.ZERO, BigInteger.valueOf(5), BigInteger.valueOf(8), BigInteger.valueOf(2),
                 BigInteger.valueOf(5), BigInteger.valueOf(16), BigInteger.valueOf(4), BigInteger.valueOf(5)};
 
@@ -50,30 +63,7 @@ public class TestDecryptEncrypt {
         BigInteger[] decodedFirst = encoder.decode(decryptedFirst);
         BigInteger[] decodedSecond = encoder.decode(decryptedSecond);
 
-        System.out.println(Arrays.stream(plaintextFirst.getPolynomial().getCoefficients())
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
-
-        System.out.println(Arrays.stream(decryptedFirst.getPolynomial().getCoefficients())
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
-
-        System.out.println(Arrays.stream(decodedFirst)
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
-
-        System.out.println();
-
-        System.out.println(Arrays.stream(plaintextSecond.getPolynomial().getCoefficients())
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
-
-        System.out.println(Arrays.stream(decryptedSecond.getPolynomial().getCoefficients())
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
-
-        System.out.println(Arrays.stream(decodedSecond)
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
+        assertArrayEquals(message1, decodedFirst);
+        assertArrayEquals(message2, decodedSecond);
     }
 }

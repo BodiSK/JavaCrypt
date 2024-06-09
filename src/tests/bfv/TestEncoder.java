@@ -1,44 +1,58 @@
 package tests.bfv;
 
+import org.junit.Before;
+import org.junit.Test;
 import scheme.bfv.BatchEncoder;
 import scheme.bfv.Parameters;
 import utils.operations.SamplingOperations;
 import utils.structures.Plaintext;
-import utils.structures.Polynomial;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
 
 public class TestEncoder {
-    public static void main(String[] args) {
 
-        int polynomialDegree = 8;
-        BigInteger plainTextMod = BigInteger.valueOf(17);
-        BigInteger cipherTextMod = new BigInteger("3fffffff000001", 16);
+    private BatchEncoder encoder;
+    private int polynomialDegree;
+    private BigInteger plainTextMod;
+    private BigInteger cipherTextMod;
 
+    @Before
+    public void setUp() {
+        polynomialDegree = 8;
+        plainTextMod = BigInteger.valueOf(17);
+        cipherTextMod = new BigInteger("3fffffff000001", 16);
 
         Parameters params = new Parameters(polynomialDegree, plainTextMod, cipherTextMod);
+        encoder = new BatchEncoder(params);
+    }
 
-        BatchEncoder encoder = new BatchEncoder(params);
-
+    @Test
+    public void testEncodeDecode() {
         BigInteger[] toTest = SamplingOperations.normalSampling(BigInteger.ZERO, plainTextMod, polynomialDegree);
 
-        //test encode decode
-        Plaintext encodedPlaintext =  encoder.encode(toTest);
+        // Test encode
+        Plaintext encodedPlaintext = encoder.encode(toTest);
         BigInteger[] encoded = encodedPlaintext.getPolynomial().getCoefficients();
-        System.out.println(Arrays.stream(toTest)
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
 
-        System.out.println(Arrays.stream(encoded)
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
+        assertNotNull(encoded);
+        assertEquals(polynomialDegree, encoded.length);
 
+        System.out.println("Original: " + Arrays.toString(toTest));
+        System.out.println("Encoded: " + Arrays.toString(encoded));
+
+        // Test decode
         BigInteger[] decoded = encoder.decode(encodedPlaintext);
 
-        System.out.println(Arrays.stream(decoded)
-                .map(String::valueOf)
-                .collect(Collectors.joining(" ")));
+        assertNotNull(decoded);
+        assertEquals(polynomialDegree, decoded.length);
+
+        for (int i = 0; i < polynomialDegree; i++) {
+            assertEquals(toTest[i].mod(plainTextMod), decoded[i]);
+        }
+
+        System.out.println("Decoded: " + Arrays.toString(decoded));
     }
 }
