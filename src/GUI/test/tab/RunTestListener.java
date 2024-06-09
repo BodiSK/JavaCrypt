@@ -38,6 +38,12 @@ public class RunTestListener implements ActionListener {
             JOptionPane.showMessageDialog(panel,
                     "Please enter valid integer values for all parameters.",
                     "Input Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception exception) {
+            panel.getConsole().setText("");
+            JOptionPane.showMessageDialog(panel,
+                    "There was an error with, processing your input." +
+                            " If you are not familiar wth the constraints please refer to the more info sections.",
+                    "Input Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

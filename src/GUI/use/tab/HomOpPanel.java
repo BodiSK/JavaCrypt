@@ -9,7 +9,6 @@ import utils.structures.SecretKey;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.math.BigInteger;
 
 public class HomOpPanel extends JPanel {
 

@@ -57,12 +57,15 @@ public class UseCasesPanel extends JPanel {
         switch (panelName) {
             case "Key Generation & Encryption":
                 mainCardLayout.show(mainCardPanel, "KeyGenEnc");
+                outputArea.setText("");
                 break;
             case "Homomorphic Operations":
                 mainCardLayout.show(mainCardPanel, "HomOp");
+                outputArea.setText("");
                 break;
             case "Decryption":
                 mainCardLayout.show(mainCardPanel, "Decrypt");
+                outputArea.setText("");
                 break;
         }
     }

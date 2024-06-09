@@ -3,9 +3,7 @@ package GUI.use.tab;
 import scheme.bfv.*;
 import utils.structures.Ciphertext;
 import utils.structures.Plaintext;
-import utils.structures.PublicKey;
 import utils.structures.SecretKey;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -21,6 +19,7 @@ public class DecryptPanel extends JPanel {
     private BatchEncoder encoder;
     private Decryptor decryptor;
     private Ciphertext lastCiphertext;
+    private BigInteger[] lastDecryptedResult;
 
     public DecryptPanel(JTextArea outputArea) {
         this.outputArea = outputArea;
@@ -38,19 +37,32 @@ public class DecryptPanel extends JPanel {
         decryptSection.setLayout(new BoxLayout(decryptSection, BoxLayout.Y_AXIS));
         decryptSection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Decrypt and Decode"));
 
-        JButton loadSecretKeyButton = new JButton("Load Secret Key");
+        JButton loadSecretKeyButton = createButton("Load Secret Key");
         loadSecretKeyButton.addActionListener(e -> loadSecretKeyFromFile());
         decryptSection.add(loadSecretKeyButton);
 
-        JButton loadCiphertextButton = new JButton("Load Ciphertext");
+        JButton loadCiphertextButton = createButton("Load Ciphertext");
         loadCiphertextButton.addActionListener(e -> loadCiphertextFromFile());
         decryptSection.add(loadCiphertextButton);
 
-        JButton decryptButton = new JButton("Decrypt");
+        JButton decryptButton = createButton("Decrypt");
         decryptButton.addActionListener(e -> decryptCiphertext());
         decryptSection.add(decryptButton);
 
+        JButton saveButton = createButton("Save Decrypted Output");
+        saveButton.addActionListener(e -> saveDecryptedOutputAsCSV());
+        decryptSection.add(saveButton);
+
         add(decryptSection, BorderLayout.CENTER);
+    }
+
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        Dimension preferredSize = new Dimension(200, 30);
+        button.setPreferredSize(preferredSize);
+        button.setMaximumSize(preferredSize);
+        return button;
     }
 
     private void loadSecretKeyFromFile() {
@@ -97,12 +109,34 @@ public class DecryptPanel extends JPanel {
         }
         try {
             Plaintext decrypted = decryptor.decrypt(lastCiphertext, null);
-            BigInteger[] coefficients = encoder.decode(decrypted);
-            String decryptedText = Arrays.toString(coefficients);
+            lastDecryptedResult = encoder.decode(decrypted);
+            String decryptedText = Arrays.toString(lastDecryptedResult);
             outputArea.append("Decrypted: " + decryptedText + "\n");
         } catch (Exception e) {
             outputArea.append("Decryption failed: " + e.getMessage() + "\n");
             e.printStackTrace();
+        }
+    }
+
+    private void saveDecryptedOutputAsCSV() {
+        if (lastDecryptedResult == null) {
+            outputArea.append("No decrypted result to save.\n");
+            return;
+        }
+        fileChooser.setDialogTitle("Save Decrypted Output");
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
+                for (BigInteger value : lastDecryptedResult) {
+                    writer.write(value.toString());
+                    writer.newLine();
+                }
+                outputArea.append("Decrypted output saved to file: " + fileToSave.getAbsolutePath() + "\n");
+            } catch (IOException e) {
+                outputArea.append("Error saving decrypted output to file: " + e.getMessage() + "\n");
+                e.printStackTrace();
+            }
         }
     }
 }
